@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:SteamIdler.Views"
+             xmlns:models="clr-namespace:SteamIdler.Models"
+             xmlns:lc="clr-namespace:SteamIdler.Localization"
+             mc:Ignorable="d"
+             x:Class="SteamIdler.Views.MasterPage"
+             Title="{x:Static lc:Strings.Menus}">
+    <StackLayout>
+        <ListView x:Name="ListView" x:FieldModifier="public">
+            <ListView.ItemsSource>
+                <x:Array Type="{x:Type models:MasterPageItem}">
+                    <models:MasterPageItem Title="{x:Static lc:Strings.Accounts}" TargetType="{x:Type local:AccountListPage}" />
+                </x:Array>
+            </ListView.ItemsSource>
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <Grid Padding="5,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{Binding IconSource}" />
+                            <Label Grid.Column="1" Text="{Binding Title}" />
+                        </Grid>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </StackLayout>
+</ContentPage>
