@@ -126,4 +126,16 @@
   <data name="Menus" xml:space="preserve">
     <value>메뉴</value>
   </data>
+  <data name="Password" xml:space="preserve">
+    <value>비밀번호</value>
+  </data>
+  <data name="SignInToYourAccount" xml:space="preserve">
+    <value>계정에 로그인</value>
+  </data>
+  <data name="TwoFactorCode" xml:space="preserve">
+    <value>2단계 인증 번호</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>유저이름</value>
+  </data>
 </root>

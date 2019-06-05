@@ -86,5 +86,41 @@ namespace SteamIdler.Localization {
                 return ResourceManager.GetString("Menus", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   비밀번호과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   계정에 로그인과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string SignInToYourAccount {
+            get {
+                return ResourceManager.GetString("SignInToYourAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   2단계 인증 번호과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string TwoFactorCode {
+            get {
+                return ResourceManager.GetString("TwoFactorCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   유저이름과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Username {
+            get {
+                return ResourceManager.GetString("Username", resourceCulture);
+            }
+        }
     }
 }

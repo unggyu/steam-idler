@@ -16,5 +16,19 @@ namespace SteamIdler.Views
         {
             InitializeComponent();
         }
+
+        #region Private Methods
+        private async Task NavigateToLoginPage()
+        {
+            await Navigation.PushAsync(new LoginPage());
+        }
+        #endregion
+
+        #region Event Handlers
+        private async void ListView_ItemTapped(object sender, ItemTappedEventArgs e)
+        {
+            await NavigateToLoginPage();
+        }
+        #endregion
     }
 }

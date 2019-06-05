@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SteamIdler.ViewModels;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -15,6 +11,13 @@ namespace SteamIdler.Views
         public LoginPage()
         {
             InitializeComponent();
+
+            MessagingCenter.Subscribe<AccountViewModel>(this, "LoginSuccessful", NavigateToAccountDetailsPage);
+        }
+
+        private void NavigateToAccountDetailsPage(AccountViewModel accountViewModel)
+        {
+            Navigation.PushAsync(new AccountDetailsPage());
         }
     }
 }

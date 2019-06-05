@@ -1,6 +1,7 @@
 ﻿using SteamKit2;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -16,7 +17,8 @@ namespace SteamBot
         private readonly CallbackManager _callbackManager;
         private readonly SteamUser _steamUser;
         private bool _isRunning;
-        private bool _isLoggedOn;
+        private EResult? _loggedOnResult;
+        private CancellationTokenSource _tokenSource;
         #endregion
 
         #region Constructors
@@ -41,30 +43,42 @@ namespace SteamBot
             #region Subscribe Callbacks
             _callbackManager.Subscribe<SteamClient.ConnectedCallback>(OnConnectedEventHandler);
             _callbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnectedEventHandler);
-
             _callbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOnEventHandler);
             _callbackManager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOffEventHandler);
-
             _callbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnUpdateMachineAuthEventHandler);
-
             _callbackManager.Subscribe<SteamUser.LoginKeyCallback>(OnLoginKeyEventHandler);
             #endregion
         }
         #endregion
 
         #region Properties
-        public SteamUser.LogOnDetails LogOnDetails { get; set; } = new SteamUser.LogOnDetails();
-        public bool IsConnected => _steamClient.IsConnected;
-
-        public bool IsLoggedOn
+        public bool IsRunning
         {
-            get => _isLoggedOn;
+            get => _isRunning;
             set
             {
-                _isLoggedOn = value;
+                _isRunning = value;
+                OnPropertyChanged();
+
+                if (!_isRunning && _tokenSource != null)
+                {
+                    _tokenSource.Cancel();
+                }
+            }
+        }
+
+        public EResult? LoggedOnResult
+        {
+            get => _loggedOnResult;
+            set
+            {
+                _loggedOnResult = value;
                 OnPropertyChanged();
             }
         }
+
+        public SteamUser.LogOnDetails LogOnDetails { get; set; } = new SteamUser.LogOnDetails();
+        public bool IsConnected => _steamClient.IsConnected;
         #endregion
 
         #region Events
@@ -79,15 +93,28 @@ namespace SteamBot
         #endregion
 
         #region Public Methods
-        public async Task ConnectAndWAitCallbacksAsync(CancellationToken token = default)
+        public async Task ConnectAndWaitCallbacksAsync()
         {
-            _isRunning = true;
+            IsRunning = true;
 
             if (!IsConnected)
             {
                 _steamClient.Connect();
 
-                await WaitCallbacks(token);
+                try
+                {
+                    _tokenSource = new CancellationTokenSource();
+
+                    await WaitCallbacksAsync(_tokenSource.Token);
+                }
+                catch (OperationCanceledException ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+                finally
+                {
+                    _tokenSource.Dispose();
+                }
             }
         }
 
@@ -105,7 +132,7 @@ namespace SteamBot
         #endregion
 
         #region Private Methods
-        private async Task WaitCallbacks(CancellationToken token = default)
+        private async Task WaitCallbacksAsync(CancellationToken token = default)
         {
             await Task.Run(() =>
             {
@@ -113,7 +140,7 @@ namespace SteamBot
                 {
                     if (token.IsCancellationRequested)
                     {
-                        break;
+                        token.ThrowIfCancellationRequested();
                     }
 
                     _callbackManager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
@@ -144,10 +171,10 @@ namespace SteamBot
 
         private void OnLoggedOnEventHandler(SteamUser.LoggedOnCallback callback)
         {
+            LoggedOnResult = callback.Result;
+
             if (callback.Result == EResult.OK)
             {
-                IsLoggedOn = true;
-
                 LoginSuccessful?.Invoke(this, EventArgs.Empty);
             }
         }
@@ -155,7 +182,7 @@ namespace SteamBot
         private void OnLoggedOffEventHandler(SteamUser.LoggedOffCallback callback)
         {
             LoggedOff?.Invoke(this, callback);
-            IsLoggedOn = false;
+            LoggedOnResult = null;
         }
 
         private void OnUpdateMachineAuthEventHandler(SteamUser.UpdateMachineAuthCallback callback)
