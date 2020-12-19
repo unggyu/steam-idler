@@ -12,16 +12,13 @@ namespace SteamBot
 {
     public class Bot : INotifyPropertyChanged
     {
-        #region Fields
         private readonly SteamClient _steamClient;
         private readonly CallbackManager _callbackManager;
         private readonly SteamUser _steamUser;
         private bool _isRunning;
         private EResult? _loggedOnResult;
         private CancellationTokenSource _tokenSource;
-        #endregion
 
-        #region Constructors
         public Bot(string username, string password) : this()
         {
             LogOnDetails.Username = username;
@@ -40,18 +37,14 @@ namespace SteamBot
 
             _steamUser = _steamClient.GetHandler<SteamUser>();
 
-            #region Subscribe Callbacks
             _callbackManager.Subscribe<SteamClient.ConnectedCallback>(OnConnectedEventHandler);
             _callbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnectedEventHandler);
             _callbackManager.Subscribe<SteamUser.LoggedOnCallback>(OnLoggedOnEventHandler);
             _callbackManager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOffEventHandler);
             _callbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnUpdateMachineAuthEventHandler);
             _callbackManager.Subscribe<SteamUser.LoginKeyCallback>(OnLoginKeyEventHandler);
-            #endregion
         }
-        #endregion
 
-        #region Properties
         public bool IsRunning
         {
             get => _isRunning;
@@ -79,9 +72,7 @@ namespace SteamBot
 
         public SteamUser.LogOnDetails LogOnDetails { get; set; } = new SteamUser.LogOnDetails();
         public bool IsConnected => _steamClient.IsConnected;
-        #endregion
 
-        #region Events
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler<SteamClient.ConnectedCallback> Connected;
         public event EventHandler<SteamClient.DisconnectedCallback> Disconnected;
@@ -90,9 +81,7 @@ namespace SteamBot
         public event EventHandler<SteamUser.UpdateMachineAuthCallback> UpdateMachineAuth;
         public event EventHandler<SteamUser.LoginKeyCallback> ReceivedLoginKey;
         public event EventHandler LoginSuccessful;
-        #endregion
 
-        #region Public Methods
         public async Task ConnectAndWaitCallbacksAsync()
         {
             IsRunning = true;
@@ -129,9 +118,7 @@ namespace SteamBot
 
             _steamUser.LogOn(LogOnDetails);
         }
-        #endregion
 
-        #region Private Methods
         private async Task WaitCallbacksAsync(CancellationToken token = default)
         {
             await Task.Run(() =>
@@ -152,9 +139,7 @@ namespace SteamBot
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        #endregion
 
-        #region Event Handlers
         private void OnConnectedEventHandler(SteamClient.ConnectedCallback callback)
         {
             Connected?.Invoke(this, callback);
@@ -226,6 +211,5 @@ namespace SteamBot
         {
             LogOnDetails.LoginKey = callback.LoginKey;
         }
-        #endregion
     }
 }
