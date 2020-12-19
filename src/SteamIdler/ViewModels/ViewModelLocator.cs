@@ -13,6 +13,7 @@ namespace SteamIdler.ViewModels
             _serviceProvider = ServiceLocator.Current.GetService<IServiceProvider>();
         }
 
+        public MySplashViewModel MySplash => _serviceProvider.GetService<MySplashViewModel>();
         public LoginViewModel Login => _serviceProvider.GetService<LoginViewModel>();
     }
 }

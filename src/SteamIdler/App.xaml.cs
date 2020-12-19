@@ -1,5 +1,6 @@
 ﻿using CommonServiceLocator;
 using Microsoft.Extensions.DependencyInjection;
+using Prism.Events;
 using SteamIdler.ViewModels;
 using SteamIdler.Views;
 using System;
@@ -20,7 +21,12 @@ namespace SteamIdler
 
         private IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<LoginViewModel>();
+            services
+                .AddScoped<MySplashViewModel>()
+                .AddScoped<LoginViewModel>();
+
+            services
+                .AddScoped<IEventAggregator, EventAggregator>();
 
             return services.BuildServiceProvider();
         }
@@ -30,6 +36,13 @@ namespace SteamIdler
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            var splashScreen = new MySplashScreen();
+            var result = splashScreen.ShowDialog();
+            if (result == null || !result.Value)
+            {
+                Shutdown();
+            }
 
             var loginWindow = new LoginWindow();
             loginWindow.Show();

@@ -70,6 +70,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Loading과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Loading {
+            get {
+                return ResourceManager.GetString("Loading", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Password과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string Password {
