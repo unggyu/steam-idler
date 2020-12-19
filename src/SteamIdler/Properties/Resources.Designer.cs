@@ -86,5 +86,14 @@ namespace SteamIdler.Properties {
                 return ResourceManager.GetString("SignIn", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Username과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Username {
+            get {
+                return ResourceManager.GetString("Username", resourceCulture);
+            }
+        }
     }
 }

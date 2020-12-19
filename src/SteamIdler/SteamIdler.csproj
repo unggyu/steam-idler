@@ -5,16 +5,19 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <StartupObject>SteamIdler.App</StartupObject>
-  </PropertyGroup>
+  </PropertyGroup> 
 
   <ItemGroup>
-    <Folder Include="ViewModels\" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
+    <PackageReference Include="Gu.Wpf.Localization" Version="6.7.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.1.0" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.3-preview.201204.0" />
+    <PackageReference Include="Prism.Core" Version="8.0.0.1909" />
   </ItemGroup> 
 
   <ItemGroup>
-    <PackageReference Include="Gu.Wpf.Localization" Version="6.7.0" />
-    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="1.1.0" />
-    <PackageReference Include="ModernWpfUI" Version="0.9.3-preview.201204.0" />
+    <ProjectReference Include="..\SteamBot\SteamBot.csproj" />
   </ItemGroup>
 
   <ItemGroup>

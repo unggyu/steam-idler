@@ -126,4 +126,7 @@
   <data name="SignIn" xml:space="preserve">
     <value>로그인</value>
   </data>
+  <data name="Username" xml:space="preserve">
+    <value>유저명</value>
+  </data>
 </root>

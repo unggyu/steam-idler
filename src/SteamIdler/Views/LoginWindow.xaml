@@ -10,6 +10,7 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
+        DataContext="{Binding Login, Source={StaticResource Locator}}"
         Title="{localize:Static properties:Resources.SignIn}" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -21,6 +22,10 @@
             VerticalAlignment="Center"
             FontSize="48"
             Text="{localize:Static properties:Resources.SignIn}" />
-        <uc:CredentialInput Grid.Row="1" />
+        <uc:CredentialInput
+            x:Name="CredentialInput"
+            Grid.Row="1"
+            Username="{Binding Username}"
+            SignInCommand="{Binding SignInCommand}" />
     </Grid>
 </Window>

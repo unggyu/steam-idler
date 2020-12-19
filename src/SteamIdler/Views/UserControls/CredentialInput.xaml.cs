@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace SteamIdler.Views.UserControls
 {
@@ -8,17 +9,24 @@ namespace SteamIdler.Views.UserControls
     /// </summary>
     public partial class CredentialInput : UserControl
     {
-        public static readonly DependencyProperty IdProperty = DependencyProperty.Register(nameof(Id), typeof(string), typeof(CredentialInput));
+        public static readonly DependencyProperty UsernameProperty = DependencyProperty.Register(nameof(Username), typeof(string), typeof(CredentialInput));
+        public static readonly DependencyProperty SignInCommandProperty = DependencyProperty.Register(nameof(SignInCommand), typeof(ICommand), typeof(CredentialInput));
 
         public CredentialInput()
         {
             InitializeComponent();
         }
 
-        public string Id
+        public string Username
         {
-            get => (string)GetValue(IdProperty);
-            set => SetValue(IdProperty, value);
+            get => (string)GetValue(UsernameProperty);
+            set => SetValue(UsernameProperty, value);
+        }
+
+        public ICommand SignInCommand
+        {
+            get => (ICommand)GetValue(SignInCommandProperty);
+            set => SetValue(SignInCommandProperty, value);
         }
 
         public string GetPassword()
