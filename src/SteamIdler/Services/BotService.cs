@@ -10,8 +10,6 @@ namespace SteamIdler.Services
     public class BotService
     {
         private static BotService _instance;
-        private readonly PasswordService _passwordService;
-        private readonly Bot _bot;
 
         public static BotService Instance
         {
@@ -25,6 +23,9 @@ namespace SteamIdler.Services
                 return _instance;
             }
         }
+
+        private readonly PasswordService _passwordService;
+        private readonly Bot _bot;
 
         public BotService()
         {

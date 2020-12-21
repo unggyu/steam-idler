@@ -44,8 +44,15 @@ namespace SteamIdler
                 Shutdown();
             }
 
-            var loginWindow = new LoginWindow();
-            loginWindow.Show();
+            try
+            {
+                var loginWindow = new LoginWindow();
+                loginWindow.Show();
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
     }
 }

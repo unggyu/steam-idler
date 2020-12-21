@@ -12,10 +12,11 @@
         WindowStartupLocation="CenterScreen"
         DataContext="{Binding Login, Source={StaticResource Locator}}"
         Title="{localize:Static properties:Resources.SignIn}" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height=".5*" />
             <RowDefinition />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock
             HorizontalAlignment="Center"
@@ -27,5 +28,10 @@
             Grid.Row="1"
             Username="{Binding Username}"
             SignInCommand="{Binding SignInCommand}" />
+        <TextBlock
+            x:Name="ErrorTextBox"
+            Grid.Row="2"
+            Foreground="Red"
+            Text="{Binding ErrorText}" />
     </Grid>
 </Window>
