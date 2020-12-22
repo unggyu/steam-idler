@@ -77,10 +77,11 @@ namespace SteamBot
         public event EventHandler<SteamClient.ConnectedCallback> Connected;
         public event EventHandler<SteamClient.DisconnectedCallback> Disconnected;
         public event EventHandler<SteamUser.LoggedOnCallback> LoggedOn;
+        public event EventHandler<SteamUser.LoggedOnCallback> LoginSuccessful;
+        public event EventHandler<SteamUser.LoggedOnCallback> LoginFailed;
         public event EventHandler<SteamUser.LoggedOffCallback> LoggedOff;
         public event EventHandler<SteamUser.UpdateMachineAuthCallback> UpdateMachineAuth;
         public event EventHandler<SteamUser.LoginKeyCallback> ReceivedLoginKey;
-        public event EventHandler LoginSuccessful;
 
         public async Task ConnectAndWaitCallbacksAsync()
         {
@@ -156,11 +157,17 @@ namespace SteamBot
 
         private void OnLoggedOnEventHandler(SteamUser.LoggedOnCallback callback)
         {
+            LoggedOn?.Invoke(this, callback);
+
             LoggedOnResult = callback.Result;
 
             if (callback.Result == EResult.OK)
             {
-                LoginSuccessful?.Invoke(this, EventArgs.Empty);
+                LoginSuccessful?.Invoke(this, callback);
+            }
+            else
+            {
+                LoginFailed?.Invoke(this, callback);
             }
         }
 

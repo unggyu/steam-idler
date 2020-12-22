@@ -26,6 +26,7 @@
         <uc:CredentialInput
             x:Name="CredentialInput"
             Grid.Row="1"
+            Margin="0,0,0,5"
             Username="{Binding Username}"
             SignInCommand="{Binding SignInCommand}" />
         <TextBlock

@@ -37,6 +37,8 @@ namespace SteamIdler
         {
             base.OnStartup(e);
 
+            ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             var splashScreen = new MySplashScreen();
             var result = splashScreen.ShowDialog();
             if (result == null || !result.Value)
@@ -44,15 +46,8 @@ namespace SteamIdler
                 Shutdown();
             }
 
-            try
-            {
-                var loginWindow = new LoginWindow();
-                loginWindow.Show();
-            }
-            catch (Exception ex)
-            {
-
-            }
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
         }
     }
 }
