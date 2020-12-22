@@ -44,21 +44,35 @@ namespace SteamIdler.Services
             return result;
         }
 
-        public async Task<SteamUser.LoggedOnCallback> LoginAsync(string username, CancellationToken cancellationToken = default)
+        public async Task<SteamUser.LoggedOnCallback> LoginAsync(string username, string authCode = null, string twoFactorCode = null, CancellationToken cancellationToken = default)
         {
-            _bot.LogOnDetails.Username = username;
-            if (_passwordService.GetPassword == null)
-            {
-                throw new Exception("GetPassword function not found.");
-            }
-            _bot.LogOnDetails.Password = _passwordService.GetPassword();
+            SteamUser.LoggedOnCallback result;
 
-            var result = await TaskExt
-                .FromEvent<SteamUser.LoggedOnCallback>()
-                .Start(handler => _bot.LoggedOn += handler,
-                       () => _bot.Login(),
-                       handler => _bot.LoggedOn -= handler,
-                       cancellationToken);
+            try
+            {
+                _bot.LogOnDetails.Username = username;
+                if (_passwordService.GetPassword == null)
+                {
+                    throw new Exception("GetPassword function not found.");
+                }
+                _bot.LogOnDetails.Password = _passwordService.GetPassword();
+                _bot.LogOnDetails.AuthCode = authCode;
+                _bot.LogOnDetails.TwoFactorCode = twoFactorCode;
+
+                result = await TaskExt
+                    .FromEvent<SteamUser.LoggedOnCallback>()
+                    .Start(handler => _bot.LoggedOn += handler,
+                           () => _bot.Login(),
+                           handler => _bot.LoggedOn -= handler,
+                           cancellationToken);
+            }
+            finally
+            {
+                _bot.LogOnDetails.Username = null;
+                _bot.LogOnDetails.Password = null;
+                _bot.LogOnDetails.AuthCode = null;
+                _bot.LogOnDetails.TwoFactorCode = null;
+            }
 
             return result;
         }

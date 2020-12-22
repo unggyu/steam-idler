@@ -15,6 +15,9 @@ namespace SteamIdler.ViewModels
         private string _username;
         private string _errorText;
         private bool _isTryingToLogin;
+        private bool _isRequiredAuthCode;
+        private bool _isRequiredTwoFactorCode;
+        private string _code;
 
         public LoginViewModel(IEventAggregator eventAggregator)
         {
@@ -42,6 +45,37 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _isTryingToLogin, value);
         }
 
+        public bool IsRequiredAuthCode
+        {
+            get => _isRequiredAuthCode;
+            set
+            {
+                SetValue(ref _isRequiredAuthCode, value);
+                RaisePropertyChanged(nameof(IsCodeRequired));
+            }
+        }
+
+        public bool IsRequiredTwoFactorCode
+        {
+            get => _isRequiredAuthCode;
+            set
+            {
+                SetValue(ref _isRequiredTwoFactorCode, value);
+                RaisePropertyChanged(nameof(IsCodeRequired));
+            }
+        }
+
+        private bool IsCodeRequired
+        {
+            get => IsRequiredAuthCode || IsRequiredTwoFactorCode;
+        }
+
+        public string Code
+        {
+            get => _code;
+            set => SetValue(ref _code, value);
+        }
+
         public ICommand SignInCommand { get; }
 
         public async void SignIn()
@@ -56,13 +90,21 @@ namespace SteamIdler.ViewModels
             try
             {
                 var result = await _botService.LoginAsync(Username);
-                if (result.Result == EResult.OK)
+                switch (result.Result)
                 {
-                    _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish();
-                }
-                else
-                {
-                    ErrorText = result.Result.ToString();
+                    case EResult.OK:
+                        _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish();
+                        break;
+                    case EResult.AccountLogonDenied:
+                    case EResult.AccountLogonDeniedVerifiedEmailRequired:
+                        IsRequiredAuthCode = true;
+                        break;
+                    case EResult.AccountLoginDeniedNeedTwoFactor:
+                        IsRequiredTwoFactorCode = true;
+                        break;
+                    default:
+                        ErrorText = result.Result.ToString();
+                        break;
                 }
             }
             catch (Exception ex)

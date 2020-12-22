@@ -61,6 +61,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Auth Code과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AuthCode {
+            get {
+                return ResourceManager.GetString("AuthCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Id과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string Id {
@@ -93,6 +102,15 @@ namespace SteamIdler.Properties {
         internal static string SignIn {
             get {
                 return ResourceManager.GetString("SignIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Two Factor Code과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string TwoFactorCode {
+            get {
+                return ResourceManager.GetString("TwoFactorCode", resourceCulture);
             }
         }
         
