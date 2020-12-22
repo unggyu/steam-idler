@@ -46,6 +46,13 @@ namespace SteamIdler.ViewModels
 
         public async void SignIn()
         {
+            if (IsTryingToLogin)
+            {
+                return;
+            }
+
+            IsTryingToLogin = true;
+
             try
             {
                 var result = await _botService.LoginAsync(Username);
@@ -61,6 +68,10 @@ namespace SteamIdler.ViewModels
             catch (Exception ex)
             {
                 ErrorText = ex.Message;
+            }
+            finally
+            {
+                IsTryingToLogin = false;
             }
         }
     }

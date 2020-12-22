@@ -30,7 +30,7 @@
             x:Name="CredentialInput"
             Grid.Row="1"
             Margin="0,0,0,5"
-            Username="{Binding Username}"
+            Username="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
             SignInCommand="{Binding SignInCommand}"
             SignInButtonIsEnabled="{Binding IsTryingToLogin, Converter={StaticResource BooleanReverseConverter}}" />
         <TextBlock

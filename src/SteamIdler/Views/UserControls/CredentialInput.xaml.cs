@@ -9,9 +9,9 @@ namespace SteamIdler.Views.UserControls
     /// </summary>
     public partial class CredentialInput : UserControl
     {
-        public static readonly DependencyProperty UsernameProperty = DependencyProperty.Register(nameof(Username), typeof(string), typeof(CredentialInput));
-        public static readonly DependencyProperty SignInCommandProperty = DependencyProperty.Register(nameof(SignInCommand), typeof(ICommand), typeof(CredentialInput));
-        public static readonly DependencyProperty SignInButtonIsEnabledProperty = DependencyProperty.Register(nameof(SignInButtonIsEnabled), typeof(bool), typeof(CredentialInput));
+        public static readonly DependencyProperty UsernameProperty = DependencyProperty.Register(nameof(Username), typeof(string), typeof(CredentialInput), new UIPropertyMetadata(string.Empty));
+        public static readonly DependencyProperty SignInCommandProperty = DependencyProperty.Register(nameof(SignInCommand), typeof(ICommand), typeof(CredentialInput), new UIPropertyMetadata(null));
+        public static readonly DependencyProperty SignInButtonIsEnabledProperty = DependencyProperty.Register(nameof(SignInButtonIsEnabled), typeof(bool), typeof(CredentialInput), new UIPropertyMetadata(true));
 
         public CredentialInput()
         {
