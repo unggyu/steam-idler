@@ -14,6 +14,7 @@ namespace SteamIdler.ViewModels
         private readonly BotService _botService;
         private string _username;
         private string _errorText;
+        private bool _isTryingToLogin;
 
         public LoginViewModel(IEventAggregator eventAggregator)
         {
@@ -33,6 +34,12 @@ namespace SteamIdler.ViewModels
         {
             get => _errorText;
             set => SetValue(ref _errorText, value);
+        }
+
+        public bool IsTryingToLogin
+        {
+            get => _isTryingToLogin;
+            set => SetValue(ref _isTryingToLogin, value);
         }
 
         public ICommand SignInCommand { get; }

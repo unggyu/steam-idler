@@ -12,6 +12,9 @@
         WindowStartupLocation="CenterScreen"
         DataContext="{Binding Login, Source={StaticResource Locator}}"
         Title="{localize:Static properties:Resources.SignIn}" Height="450" Width="800">
+    <Window.InputBindings>
+        <KeyBinding Key="Return" Command="{Binding SignInCommand}" />
+    </Window.InputBindings>
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height=".5*" />
@@ -28,7 +31,8 @@
             Grid.Row="1"
             Margin="0,0,0,5"
             Username="{Binding Username}"
-            SignInCommand="{Binding SignInCommand}" />
+            SignInCommand="{Binding SignInCommand}"
+            SignInButtonIsEnabled="{Binding IsTryingToLogin, Converter={StaticResource BooleanReverseConverter}}" />
         <TextBlock
             x:Name="ErrorTextBox"
             Grid.Row="2"
