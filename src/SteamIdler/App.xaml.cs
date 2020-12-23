@@ -40,14 +40,21 @@ namespace SteamIdler
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
             var splashScreen = new MySplashScreen();
-            var result = splashScreen.ShowDialog();
-            if (result == null || !result.Value)
+            var splashScreenResult = splashScreen.ShowDialog();
+            if (splashScreenResult == null || !splashScreenResult.Value)
             {
                 Shutdown();
             }
 
             var loginWindow = new LoginWindow();
-            loginWindow.Show();
+            var loginResult = loginWindow.ShowDialog();
+            if (loginResult == null || !loginResult.Value)
+            {
+                Shutdown();
+            }
+
+            var mainWindow = new MainWindow();
+            mainWindow.Show();
         }
     }
 }

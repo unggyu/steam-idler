@@ -48,16 +48,6 @@ namespace SteamBot
         public bool IsRunning
         {
             get => _isRunning;
-            set
-            {
-                _isRunning = value;
-                OnPropertyChanged();
-
-                if (!_isRunning && _tokenSource != null)
-                {
-                    _tokenSource.Cancel();
-                }
-            }
         }
 
         public EResult? LoggedOnResult
@@ -83,9 +73,9 @@ namespace SteamBot
         public event EventHandler<SteamUser.UpdateMachineAuthCallback> UpdateMachineAuth;
         public event EventHandler<SteamUser.LoginKeyCallback> ReceivedLoginKey;
 
-        public async Task ConnectAndWaitCallbacksAsync()
+        public async void ConnectAndWaitCallbacks()
         {
-            IsRunning = true;
+            _isRunning = true;
 
             if (!IsConnected)
             {
@@ -108,8 +98,15 @@ namespace SteamBot
             }
         }
 
+        public void Disconnect()
+        {
+            _tokenSource.Cancel();
+        }
+
         public void Login()
         {
+            Debug.WriteLine("[Bot.cs] Login");
+
             if (File.Exists("sentry.bin"))
             {
                 var sentryFile = File.ReadAllBytes("sentry.bin");
@@ -120,15 +117,15 @@ namespace SteamBot
             _steamUser.LogOn(LogOnDetails);
         }
 
-        private async Task WaitCallbacksAsync(CancellationToken token = default)
+        private async Task WaitCallbacksAsync(CancellationToken cancellationToken = default)
         {
             await Task.Run(() =>
             {
-                while (_isRunning)
+                while (IsRunning)
                 {
-                    if (token.IsCancellationRequested)
+                    if (cancellationToken.IsCancellationRequested)
                     {
-                        token.ThrowIfCancellationRequested();
+                        cancellationToken.ThrowIfCancellationRequested();
                     }
 
                     _callbackManager.RunWaitCallbacks(TimeSpan.FromSeconds(1));
@@ -136,13 +133,14 @@ namespace SteamBot
             });
         }
 
-        private void OnPropertyChanged([CallerMemberName]string propertyName = "")
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void OnConnectedEventHandler(SteamClient.ConnectedCallback callback)
         {
+            Debug.WriteLine("[Bot.cs] Connected Event Invoke");
             Connected?.Invoke(this, callback);
             OnPropertyChanged(nameof(IsConnected));
         }
@@ -151,12 +149,14 @@ namespace SteamBot
         {
             _isRunning = false;
 
+            Debug.WriteLine("[Bot.cs] Disconnected Event Invoke");
             Disconnected?.Invoke(this, callback);
             OnPropertyChanged(nameof(IsConnected));
         }
 
         private void OnLoggedOnEventHandler(SteamUser.LoggedOnCallback callback)
         {
+            Debug.WriteLine("[Bot.cs] LoggedOn Event Invoke");
             LoggedOn?.Invoke(this, callback);
 
             LoggedOnResult = callback.Result;
@@ -173,6 +173,7 @@ namespace SteamBot
 
         private void OnLoggedOffEventHandler(SteamUser.LoggedOffCallback callback)
         {
+            Debug.WriteLine("[Bot.cs] LoggedOff Event Invoke");
             LoggedOff?.Invoke(this, callback);
             LoggedOnResult = null;
         }

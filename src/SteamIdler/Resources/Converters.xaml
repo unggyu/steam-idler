@@ -2,4 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:converters="clr-namespace:SteamIdler.Converters">
     <converters:BooleanReverseConverter x:Key="BooleanReverseConverter" />
+    <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <converters:NullableToBooleanConverter x:Key="NullableToBooleanConverter" />
+    <converters:ValueConverterGroup x:Key="NullableToVisibilityConverter">
+        <converters:NullableToBooleanConverter />
+        <converters:BooleanToVisibilityConverter />
+    </converters:ValueConverterGroup>
 </ResourceDictionary>

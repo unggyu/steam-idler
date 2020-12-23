@@ -1,9 +1,11 @@
 ﻿using Prism.Commands;
 using Prism.Events;
+using SteamIdler.Constants;
 using SteamIdler.Events;
 using SteamIdler.Services;
 using SteamKit2;
 using System;
+using System.Threading;
 using System.Windows.Input;
 
 namespace SteamIdler.ViewModels
@@ -15,8 +17,7 @@ namespace SteamIdler.ViewModels
         private string _username;
         private string _errorText;
         private bool _isTryingToLogin;
-        private bool _isRequiredAuthCode;
-        private bool _isRequiredTwoFactorCode;
+        private CodeType? _codeType;
         private string _code;
 
         public LoginViewModel(IEventAggregator eventAggregator)
@@ -45,29 +46,10 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _isTryingToLogin, value);
         }
 
-        public bool IsRequiredAuthCode
+        public CodeType? CodeType
         {
-            get => _isRequiredAuthCode;
-            set
-            {
-                SetValue(ref _isRequiredAuthCode, value);
-                RaisePropertyChanged(nameof(IsCodeRequired));
-            }
-        }
-
-        public bool IsRequiredTwoFactorCode
-        {
-            get => _isRequiredAuthCode;
-            set
-            {
-                SetValue(ref _isRequiredTwoFactorCode, value);
-                RaisePropertyChanged(nameof(IsCodeRequired));
-            }
-        }
-
-        private bool IsCodeRequired
-        {
-            get => IsRequiredAuthCode || IsRequiredTwoFactorCode;
+            get => _codeType;
+            set => SetValue(ref _codeType, value);
         }
 
         public string Code
@@ -89,21 +71,29 @@ namespace SteamIdler.ViewModels
 
             try
             {
-                var result = await _botService.LoginAsync(Username);
-                switch (result.Result)
+                using var tcs = new CancellationTokenSource();
+                tcs.CancelAfter(10000);
+                var loginResult = await _botService.LoginAsync(Username, Code, CodeType ?? null, tcs.Token);
+                switch (loginResult.Result)
                 {
                     case EResult.OK:
                         _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish();
                         break;
                     case EResult.AccountLogonDenied:
                     case EResult.AccountLogonDeniedVerifiedEmailRequired:
-                        IsRequiredAuthCode = true;
+                        await _botService.AwaitDisconnectAsync();
+                        CodeType = Constants.CodeType.Auth;
+                        await _botService.ConnectAsync();
                         break;
                     case EResult.AccountLoginDeniedNeedTwoFactor:
-                        IsRequiredTwoFactorCode = true;
+                        await _botService.AwaitDisconnectAsync();
+                        CodeType = Constants.CodeType.TwoFactor;
+                        await _botService.ConnectAsync();
                         break;
                     default:
-                        ErrorText = result.Result.ToString();
+                        await _botService.AwaitDisconnectAsync();
+                        ErrorText = loginResult.Result.ToString();
+                        await _botService.ConnectAsync();
                         break;
                 }
             }

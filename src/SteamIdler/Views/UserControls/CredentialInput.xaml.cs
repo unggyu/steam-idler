@@ -14,7 +14,7 @@ namespace SteamIdler.Views.UserControls
         public static readonly DependencyProperty SignInCommandProperty = DependencyProperty.Register(nameof(SignInCommand), typeof(ICommand), typeof(CredentialInput), new UIPropertyMetadata(null));
         public static readonly DependencyProperty SignInButtonIsEnabledProperty = DependencyProperty.Register(nameof(SignInButtonIsEnabled), typeof(bool), typeof(CredentialInput), new UIPropertyMetadata(true));
         public static readonly DependencyProperty CodeProperty = DependencyProperty.Register(nameof(Code), typeof(string), typeof(CredentialInput), new UIPropertyMetadata(string.Empty));
-        public static readonly DependencyProperty CodeTextBoxVisibilityProperty = DependencyProperty.Register(nameof(CodeTextBox), typeof(Visibility), typeof(CredentialInput), new UIPropertyMetadata(Visibility.Collapsed));
+        public static readonly DependencyProperty CodeTextBoxVisibilityProperty = DependencyProperty.Register(nameof(CodeTextBoxVisibility), typeof(Visibility), typeof(CredentialInput), new UIPropertyMetadata(Visibility.Collapsed));
         public static readonly DependencyProperty CodeTypeProperty = DependencyProperty.Register(nameof(CodeType), typeof(CodeType), typeof(CredentialInput), new UIPropertyMetadata(default(CodeType)));
 
         public CredentialInput()

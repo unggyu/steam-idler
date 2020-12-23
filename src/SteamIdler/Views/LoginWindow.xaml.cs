@@ -1,5 +1,9 @@
-﻿using SteamIdler.Services;
+﻿using CommonServiceLocator;
+using Prism.Events;
+using SteamIdler.Services;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
+using SteamIdler.Events;
 
 namespace SteamIdler.Views
 {
@@ -8,10 +12,15 @@ namespace SteamIdler.Views
     /// </summary>
     public partial class LoginWindow : Window
     {
+        private readonly IEventAggregator _eventAggregator;
+
         public LoginWindow()
         {
             InitializeComponent();
             Initialize();
+
+            _eventAggregator = ServiceLocator.Current.GetService<IEventAggregator>();
+            _eventAggregator.GetEvent<LoginSuccessfulEvent>().Subscribe(() => DialogResult = true);
         }
 
         public void Initialize()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,7 +10,11 @@ namespace SteamIdler.Helpers
         public static EapTask<TEventArgs, EventHandler<TEventArgs>> FromEvent<TEventArgs>()
         {
             var tcs = new TaskCompletionSource<TEventArgs>();
-            var handler = new EventHandler<TEventArgs>((s, e) => tcs.TrySetResult(e));
+            var handler = new EventHandler<TEventArgs>((s, e) =>
+            {
+                Debug.WriteLine($"[TaskExt.cs] TrySetResult: {e}");
+                tcs.TrySetResult(e);
+            });
             return new EapTask<TEventArgs, EventHandler<TEventArgs>>(tcs, handler);
         }
     }

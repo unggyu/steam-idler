@@ -1,4 +1,5 @@
 ﻿using SteamBot;
+using SteamIdler.Constants;
 using SteamIdler.Helpers;
 using SteamKit2;
 using System;
@@ -33,18 +34,42 @@ namespace SteamIdler.Services
             _bot = new Bot();
         }
 
-        public async Task<SteamClient.ConnectedCallback> ConnectAsync()
+        public async Task<SteamClient.ConnectedCallback> ConnectAsync(CancellationToken cancellationToken = default)
         {
             var result = await TaskExt
                 .FromEvent<SteamClient.ConnectedCallback>()
                 .Start(handler => _bot.Connected += handler,
-                       async () => await _bot.ConnectAndWaitCallbacksAsync(),
-                       handler => _bot.Connected -= handler);
+                       () => _bot.ConnectAndWaitCallbacks(),
+                       handler => _bot.Connected -= handler,
+                       cancellationToken);
 
             return result;
         }
 
-        public async Task<SteamUser.LoggedOnCallback> LoginAsync(string username, string authCode = null, string twoFactorCode = null, CancellationToken cancellationToken = default)
+        public async Task<SteamClient.DisconnectedCallback> DisconnectAsync(CancellationToken cancellationToken = default)
+        {
+            var result = await TaskExt
+                .FromEvent<SteamClient.DisconnectedCallback>()
+                .Start(handler => _bot.Disconnected += handler,
+                       () => _bot.Disconnect(),
+                       handler => _bot.Disconnected -= handler,
+                       cancellationToken);
+
+            return result;
+        }
+
+        public async Task<SteamClient.ConnectedCallback> ReconnectAsync(CancellationToken cancellationToken = default)
+        {
+            if (_bot.IsConnected)
+            {
+                await DisconnectAsync(cancellationToken);
+            }
+            var result = await ConnectAsync(cancellationToken);
+
+            return result;
+        }
+
+        public async Task<SteamUser.LoggedOnCallback> LoginAsync(string username, string code = null, CodeType? codeType = null, CancellationToken cancellationToken = default)
         {
             SteamUser.LoggedOnCallback result;
 
@@ -56,8 +81,18 @@ namespace SteamIdler.Services
                     throw new Exception("GetPassword function not found.");
                 }
                 _bot.LogOnDetails.Password = _passwordService.GetPassword();
-                _bot.LogOnDetails.AuthCode = authCode;
-                _bot.LogOnDetails.TwoFactorCode = twoFactorCode;
+                if (codeType.HasValue)
+                {
+                    switch (codeType)
+                    {
+                        case CodeType.Auth:
+                            _bot.LogOnDetails.AuthCode = code;
+                            break;
+                        case CodeType.TwoFactor:
+                            _bot.LogOnDetails.TwoFactorCode = code;
+                            break;
+                    }
+                }
 
                 result = await TaskExt
                     .FromEvent<SteamUser.LoggedOnCallback>()
@@ -73,6 +108,18 @@ namespace SteamIdler.Services
                 _bot.LogOnDetails.AuthCode = null;
                 _bot.LogOnDetails.TwoFactorCode = null;
             }
+
+            return result;
+        }
+
+        public async Task<SteamClient.DisconnectedCallback> AwaitDisconnectAsync(CancellationToken cancellationToken = default)
+        {
+            var result = await TaskExt
+                .FromEvent<SteamClient.DisconnectedCallback>()
+                .Start(handler => _bot.Disconnected += handler,
+                       () => { },
+                       handler => _bot.Disconnected -= handler,
+                       cancellationToken);
 
             return result;
         }

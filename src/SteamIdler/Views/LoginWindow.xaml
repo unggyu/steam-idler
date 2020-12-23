@@ -17,7 +17,7 @@
     </Window.InputBindings>
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height=".5*" />
+            <RowDefinition Height="0.5*" />
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -31,6 +31,9 @@
             Grid.Row="1"
             Margin="0,0,0,5"
             Username="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+            CodeTextBoxVisibility="{Binding CodeType, Converter={StaticResource NullableToVisibilityConverter}, ConverterParameter=Collapsed, Mode=OneWay}"
+            CodeType="{Binding CodeType, Mode=OneWay, TargetNullValue=Auth}"
+            Code="{Binding Code, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
             SignInCommand="{Binding SignInCommand}"
             SignInButtonIsEnabled="{Binding IsTryingToLogin, Converter={StaticResource BooleanReverseConverter}}" />
         <TextBlock
