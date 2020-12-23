@@ -6,8 +6,9 @@
         xmlns:properties="clr-namespace:SteamIdler.Properties"
         xmlns:localize="http://gu.se/Localization"
         xmlns:ui="http://schemas.modernwpf.com/2019"
-        ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        WindowStartupLocation="CenterScreen"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
         Title="{localize:Static properties:Resources.SteamIdler}" Height="900" Width="1600">
     <Grid>
