@@ -23,7 +23,8 @@ namespace SteamIdler
         {
             services
                 .AddScoped<MySplashViewModel>()
-                .AddScoped<LoginViewModel>();
+                .AddScoped<LoginViewModel>()
+                .AddScoped<MainViewModel>();
 
             services
                 .AddScoped<IEventAggregator, EventAggregator>();

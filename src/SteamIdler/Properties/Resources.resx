@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountList" xml:space="preserve">
+    <value>Account List</value>
+  </data>
   <data name="AuthCode" xml:space="preserve">
     <value>Auth Code</value>
   </data>
@@ -131,6 +134,12 @@
   </data>
   <data name="SignIn" xml:space="preserve">
     <value>Sign In</value>
+  </data>
+  <data name="StartIdling" xml:space="preserve">
+    <value>StartIdling</value>
+  </data>
+  <data name="SteamIdler" xml:space="preserve">
+    <value>Steam Idler</value>
   </data>
   <data name="TwoFactorCode" xml:space="preserve">
     <value>Two Factor Code</value>

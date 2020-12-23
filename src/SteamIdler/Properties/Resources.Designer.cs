@@ -61,6 +61,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Account List과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AccountList {
+            get {
+                return ResourceManager.GetString("AccountList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Auth Code과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string AuthCode {
@@ -102,6 +111,24 @@ namespace SteamIdler.Properties {
         internal static string SignIn {
             get {
                 return ResourceManager.GetString("SignIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   StartIdling과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string StartIdling {
+            get {
+                return ResourceManager.GetString("StartIdling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Steam Idler과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string SteamIdler {
+            get {
+                return ResourceManager.GetString("SteamIdler", resourceCulture);
             }
         }
         

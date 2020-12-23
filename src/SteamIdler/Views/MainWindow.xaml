@@ -3,9 +3,50 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SteamIdler"
+        xmlns:properties="clr-namespace:SteamIdler.Properties"
+        xmlns:localize="http://gu.se/Localization"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        DataContext="{Binding Main, Source={StaticResource Locator}}"
+        Title="{localize:Static properties:Resources.SteamIdler}" Height="900" Width="1600">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width=".5*" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <TextBlock
+                Margin="10"
+                FontSize="16"
+                Text="{localize:Static properties:Resources.AccountList}" />
+            <ListBox
+                x:Name="AccountListBox"
+                Grid.Row="1" />
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ui:AutoSuggestBox
+                Margin="10,0,10,10"
+                Text="{Binding SearchKeyword, Mode=OneWayToSource}" />
+            <ListBox
+                x:Name="GameListBox"
+                Grid.Row="1"
+                Margin="10,0,10,0" />
+            <Button
+                x:Name="StartIdlingButton"
+                Grid.Row="2"
+                HorizontalAlignment="Stretch"
+                Margin="10"
+                Content="{localize:Static properties:Resources.StartIdling}" />
+        </Grid>
     </Grid>
 </Window>
