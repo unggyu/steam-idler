@@ -13,7 +13,7 @@
             set => SetValue(ref _accountId, value);
         }
 
-        public Account Account
+        public virtual Account Account
         {
             get => _account;
             set => SetValue(ref _account, value);
@@ -25,7 +25,7 @@
             set => SetValue(ref _appId, value);
         }
 
-        public App App
+        public virtual App App
         {
             get => _app;
             set => SetValue(ref _app, value);

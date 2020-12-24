@@ -4,8 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="http://schemas.modernwpf.com/2019"
-        xmlns:properties="clr-namespace:SteamIdler.Properties"
-        xmlns:localize="http://gu.se/Localization"
         ui:WindowHelper.UseModernWindowStyle="True"
         mc:Ignorable="d"
         ShowInTaskbar="False"
@@ -15,11 +13,11 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         Topmost="True"
-        DataContext="{Binding MySplash, Source={StaticResource Locator}}"
-        Title="SteamIdler Spash Screen" Height="360" Width="640">
+        Height="360" Width="640"
+        Loaded="Window_Loaded">
     <Grid>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Run Text="{Binding TaskContent}" /><Run Text="..." />
+            <Run x:Name="TaskContentRun" /><Run Text="..." />
         </TextBlock>
     </Grid>
 </Window>

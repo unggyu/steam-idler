@@ -1,8 +1,6 @@
-﻿using CommonServiceLocator;
-using Prism.Events;
-using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
-using SteamIdler.Events;
+﻿using System.Windows;
+using SteamIdler.Infrastructure.Helpers;
+using System;
 
 namespace SteamIdler.Views
 {
@@ -11,17 +9,34 @@ namespace SteamIdler.Views
     /// </summary>
     public partial class MySplashScreen : Window
     {
-        private readonly IEventAggregator _eventAggregator;
-
         public MySplashScreen()
         {
             InitializeComponent();
+        }
 
-            _eventAggregator = ServiceLocator.Current.GetService<IEventAggregator>();
-            _eventAggregator.GetEvent<InitializedEvent>().Subscribe(result =>
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Initialize();
+        }
+
+        private async void Initialize()
+        {
+            TaskContentRun.Text = Properties.Resources.Loading;
+
+            try
             {
-                DialogResult = true;
-            });
+                await DbInitializer.EnsureInitializeAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
+
+                DialogResult = false;
+
+                return;
+            }
+
+            DialogResult = true;
         }
     }
 }

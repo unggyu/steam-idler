@@ -1,4 +1,4 @@
-﻿using SteamIdler.Constants;
+﻿using SteamIdler.Infrastructure.Constants;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

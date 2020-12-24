@@ -39,8 +39,10 @@ namespace SteamIdler.Services
                 return null;
             }
 
-            var bot = loginWindow.Bot;
-            _idlingService.AddBot(bot);
+            await _idlingService.AddBotAsync(loginWindow.Bot, cancellationToken: cancellationToken);
+            var account = _idlingService.GetAccountByBot(loginWindow.Bot);
+
+            return account;
         }
     }
 }

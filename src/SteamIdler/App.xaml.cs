@@ -22,7 +22,6 @@ namespace SteamIdler
         private IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services
-                .AddScoped<MySplashViewModel>()
                 .AddScoped<LoginViewModel>()
                 .AddScoped<MainViewModel>();
 
