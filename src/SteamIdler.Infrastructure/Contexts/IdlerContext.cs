@@ -27,7 +27,9 @@ namespace SteamIdler.Infrastructure.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("idle");
+            optionsBuilder
+                .UseSqlite("Data Source=idler.db")
+                .UseLazyLoadingProxies();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

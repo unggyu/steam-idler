@@ -1,8 +1,9 @@
 ﻿using Prism.Events;
+using SteamBot;
 
 namespace SteamIdler.Events
 {
-    public class LoginSuccessfulEvent : PubSubEvent
+    public class LoginSuccessfulEvent : PubSubEvent<Bot>
     {
     }
 }

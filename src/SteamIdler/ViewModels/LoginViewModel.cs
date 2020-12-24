@@ -1,8 +1,9 @@
 ﻿using Prism.Commands;
 using Prism.Events;
-using SteamIdler.Constants;
+using SteamBot;
 using SteamIdler.Events;
-using SteamIdler.Services;
+using SteamIdler.Infrastructure.Constants;
+using SteamIdler.Infrastructure.Services;
 using SteamKit2;
 using System;
 using System.Threading;
@@ -14,6 +15,7 @@ namespace SteamIdler.ViewModels
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly BotService _botService;
+        private Bot _bot;
         private string _username;
         private string _errorText;
         private bool _isTryingToLogin;
@@ -26,6 +28,8 @@ namespace SteamIdler.ViewModels
             _botService = BotService.Instance;
 
             SignInCommand = new DelegateCommand(SignIn);
+
+            Initialize();
         }
 
         public string Username
@@ -60,7 +64,12 @@ namespace SteamIdler.ViewModels
 
         public ICommand SignInCommand { get; }
 
-        public async void SignIn()
+        private void Initialize()
+        {
+            _bot = new Bot();
+        }
+
+        private async void SignIn()
         {
             if (IsTryingToLogin)
             {
@@ -73,27 +82,27 @@ namespace SteamIdler.ViewModels
             {
                 using var tcs = new CancellationTokenSource();
                 tcs.CancelAfter(10000);
-                var loginResult = await _botService.LoginAsync(Username, Code, CodeType ?? null, tcs.Token);
+                var loginResult = await _botService.LoginAsync(_bot, Username, Code, CodeType ?? null, tcs.Token);
                 switch (loginResult.Result)
                 {
                     case EResult.OK:
-                        _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish();
+                        _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish(_bot);
                         break;
                     case EResult.AccountLogonDenied:
                     case EResult.AccountLogonDeniedVerifiedEmailRequired:
-                        await _botService.AwaitDisconnectAsync();
-                        CodeType = Constants.CodeType.Auth;
-                        await _botService.ConnectAsync();
+                        await _botService.AwaitDisconnectAsync(_bot);
+                        CodeType = Infrastructure.Constants.CodeType.Auth;
+                        await _botService.ConnectAsync(_bot);
                         break;
                     case EResult.AccountLoginDeniedNeedTwoFactor:
-                        await _botService.AwaitDisconnectAsync();
-                        CodeType = Constants.CodeType.TwoFactor;
-                        await _botService.ConnectAsync();
+                        await _botService.AwaitDisconnectAsync(_bot);
+                        CodeType = Infrastructure.Constants.CodeType.TwoFactor;
+                        await _botService.ConnectAsync(_bot);
                         break;
                     default:
-                        await _botService.AwaitDisconnectAsync();
+                        await _botService.AwaitDisconnectAsync(_bot);
                         ErrorText = loginResult.Result.ToString();
-                        await _botService.ConnectAsync();
+                        await _botService.ConnectAsync(_bot);
                         break;
                 }
             }

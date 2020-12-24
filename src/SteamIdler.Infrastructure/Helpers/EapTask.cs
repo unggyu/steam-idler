@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SteamIdler.Helpers
+namespace SteamIdler.Infrastructure.Helpers
 {
     public static class TaskExt
     {

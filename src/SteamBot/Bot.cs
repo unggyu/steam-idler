@@ -50,6 +50,15 @@ namespace SteamBot
             get => _isRunning;
         }
 
+        public bool IsRunningApp
+        {
+            get
+            {
+                // TODO: 기능 개발
+                return false;
+            }
+        }
+
         public EResult? LoggedOnResult
         {
             get => _loggedOnResult;

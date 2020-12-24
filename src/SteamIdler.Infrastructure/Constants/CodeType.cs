@@ -1,4 +1,4 @@
-﻿namespace SteamIdler.Constants
+﻿namespace SteamIdler.Infrastructure.Constants
 {
     public enum CodeType
     {

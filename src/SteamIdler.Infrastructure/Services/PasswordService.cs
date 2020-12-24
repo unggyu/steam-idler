@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SteamIdler.Services
+namespace SteamIdler.Infrastructure.Services
 {
     public class PasswordService
     {

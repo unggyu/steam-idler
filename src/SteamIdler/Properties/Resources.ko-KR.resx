@@ -120,6 +120,12 @@
   <data name="AccountList" xml:space="preserve">
     <value>계정 목록</value>
   </data>
+  <data name="AddAccount" xml:space="preserve">
+    <value>계정 추가</value>
+  </data>
+  <data name="AppSearch" xml:space="preserve">
+    <value>앱 검색</value>
+  </data>
   <data name="AuthCode" xml:space="preserve">
     <value>인증 코드</value>
   </data>

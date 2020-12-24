@@ -6,6 +6,8 @@
         xmlns:properties="clr-namespace:SteamIdler.Properties"
         xmlns:localize="http://gu.se/Localization"
         xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        xmlns:models="clr-namespace:SteamIdler.Infrastructure.Models;assembly=SteamIdler.Infrastructure"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
@@ -21,13 +23,35 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock
-                Margin="10"
-                FontSize="16"
-                Text="{localize:Static properties:Resources.AccountList}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Margin="5,0,5,5"
+                    FontSize="16"
+                    VerticalAlignment="Center"
+                    Text="{localize:Static properties:Resources.AccountList}" />
+                <Button
+                    x:Name="AddAccountButton"
+                    fa:Awesome.Content="UserPlus"
+                    Grid.Column="1"
+                    Width="50"
+                    HorizontalAlignment="Right"
+                    Margin="5,0,0,5"
+                    ToolTip="{localize:Static properties:Resources.AddAccount}"
+                    Command="{Binding AddAccountCommand}" />
+            </Grid>
             <ListBox
                 x:Name="AccountListBox"
-                Grid.Row="1" />
+                Grid.Row="1">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type models:Account}">
+                        <TextBlock Text="{Binding Username, Mode=OneWay}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -37,11 +61,13 @@
             </Grid.RowDefinitions>
             <ui:AutoSuggestBox
                 Margin="10,0,10,10"
+                ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.AppSearch}"
                 Text="{Binding SearchKeyword, Mode=OneWayToSource}" />
             <ListBox
-                x:Name="GameListBox"
+                x:Name="AppListBox"
                 Grid.Row="1"
-                Margin="10,0,10,0" />
+                Margin="10,0,10,0"
+                ItemsSource="{Binding Apps}" />
             <Button
                 x:Name="StartIdlingButton"
                 Grid.Row="2"

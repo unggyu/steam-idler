@@ -1,9 +1,10 @@
 ﻿using CommonServiceLocator;
 using Prism.Events;
-using SteamIdler.Services;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using SteamIdler.Events;
+using SteamIdler.Infrastructure.Services;
+using SteamBot;
 
 namespace SteamIdler.Views
 {
@@ -20,8 +21,14 @@ namespace SteamIdler.Views
             Initialize();
 
             _eventAggregator = ServiceLocator.Current.GetService<IEventAggregator>();
-            _eventAggregator.GetEvent<LoginSuccessfulEvent>().Subscribe(() => DialogResult = true);
+            _eventAggregator.GetEvent<LoginSuccessfulEvent>().Subscribe(bot =>
+            {
+                Bot = bot;
+                DialogResult = true;
+            });
         }
+
+        public Bot Bot { get; set; }
 
         public void Initialize()
         {

@@ -70,6 +70,24 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Add Account과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AddAccount {
+            get {
+                return ResourceManager.GetString("AddAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   App Search과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AppSearch {
+            get {
+                return ResourceManager.GetString("AppSearch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Auth Code과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string AuthCode {
