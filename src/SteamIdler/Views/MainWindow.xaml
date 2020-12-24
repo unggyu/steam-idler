@@ -45,7 +45,8 @@
             </Grid>
             <ListBox
                 x:Name="AccountListBox"
-                Grid.Row="1">
+                Grid.Row="1"
+                ItemsSource="{Binding Accounts}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Account}">
                         <TextBlock Text="{Binding Username, Mode=OneWay}" />

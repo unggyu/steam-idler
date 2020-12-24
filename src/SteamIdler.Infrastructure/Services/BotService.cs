@@ -89,43 +89,36 @@ namespace SteamIdler.Infrastructure.Services
                 throw new ArgumentNullException(nameof(bot));
             }
 
-            SteamUser.LoggedOnCallback result;
-
-            try
+            if (!bot.IsConnected)
             {
-                bot.LogOnDetails.Username = username;
-                if (_passwordService.GetPassword == null)
-                {
-                    throw new Exception("GetPassword function not found.");
-                }
-                bot.LogOnDetails.Password = _passwordService.GetPassword();
-                if (codeType.HasValue)
-                {
-                    switch (codeType)
-                    {
-                        case CodeType.Auth:
-                            bot.LogOnDetails.AuthCode = code;
-                            break;
-                        case CodeType.TwoFactor:
-                            bot.LogOnDetails.TwoFactorCode = code;
-                            break;
-                    }
-                }
+                await ConnectAsync(bot, cancellationToken);
+            }
 
-                result = await TaskExt
-                    .FromEvent<SteamUser.LoggedOnCallback>()
-                    .Start(handler => bot.LoggedOn += handler,
-                           () => bot.Login(),
-                           handler => bot.LoggedOn -= handler,
-                           cancellationToken);
-            }
-            finally
+            bot.LogOnDetails.Username = username;
+            if (_passwordService.GetPassword == null)
             {
-                bot.LogOnDetails.Username = null;
-                bot.LogOnDetails.Password = null;
-                bot.LogOnDetails.AuthCode = null;
-                bot.LogOnDetails.TwoFactorCode = null;
+                throw new Exception("GetPassword function not found.");
             }
+            bot.LogOnDetails.Password = _passwordService.GetPassword();
+            if (codeType.HasValue)
+            {
+                switch (codeType)
+                {
+                    case CodeType.Auth:
+                        bot.LogOnDetails.AuthCode = code;
+                        break;
+                    case CodeType.TwoFactor:
+                        bot.LogOnDetails.TwoFactorCode = code;
+                        break;
+                }
+            }
+
+            var result = await TaskExt
+                .FromEvent<SteamUser.LoggedOnCallback>()
+                .Start(handler => bot.LoggedOn += handler,
+                       () => bot.Login(),
+                       handler => bot.LoggedOn -= handler,
+                       cancellationToken);
 
             return result;
         }

@@ -24,10 +24,12 @@ namespace SteamIdler.Services
         }
 
         private readonly IdlingService _idlingService;
+        private readonly Repository<Account, int> _accountRepository;
 
         public AccountService()
         {
             _idlingService = IdlingService.Instance;
+            _accountRepository = new Repository<Account, int>();
         }
 
         public async Task<Account> AddAccountAsync(CancellationToken cancellationToken = default)
@@ -39,10 +41,18 @@ namespace SteamIdler.Services
                 return null;
             }
 
-            await _idlingService.AddBotAsync(loginWindow.Bot, cancellationToken: cancellationToken);
-            var account = _idlingService.GetAccountByBot(loginWindow.Bot);
+            var bot = loginWindow.Bot;
+            var account = new Account
+            {
+                Username = bot.LogOnDetails.Username,
+                Password = bot.LogOnDetails.Password
+            };
+            await _accountRepository.AddAsync(account, cancellationToken);
 
-            return account;
+            await _idlingService.AddBotAsync(bot, cancellationToken: cancellationToken);
+            var dbAccount = _idlingService.GetAccountByBot(bot);
+
+            return dbAccount;
         }
     }
 }
