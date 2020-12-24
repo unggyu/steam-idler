@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SteamBot\SteamBot.csproj" />
+    <ProjectReference Include="..\SteamIdler.Infrastructure\SteamIdler.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

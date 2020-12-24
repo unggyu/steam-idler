@@ -6,6 +6,21 @@ namespace SteamIdler.Infrastructure.Contexts
 {
     public class IdlerContext : DbContext
     {
+        private static IdlerContext _instance;
+
+        public static IdlerContext Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new IdlerContext();
+                }
+
+                return _instance;
+            }
+        }
+
         public DbSet<Account> Accounts { get; set; }
         public DbSet<App> Apps { get; set; }
         public DbSet<AccountApp> AccountApps { get; set; }

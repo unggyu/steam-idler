@@ -1,5 +1,6 @@
 ﻿using Prism.Events;
 using SteamIdler.Events;
+using SteamIdler.Infrastructure.Helpers;
 using SteamIdler.Services;
 
 namespace SteamIdler.ViewModels
@@ -15,7 +16,7 @@ namespace SteamIdler.ViewModels
             _eventAggregator = eventAggregator;
             _botService = BotService.Instance;
 
-            ConnectToServer();
+            Initialize();
         }
 
         public string TaskContent
@@ -24,12 +25,14 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _taskContent, value);
         }
 
-        public async void ConnectToServer()
+        public async void Initialize()
         {
             TaskContent = Properties.Resources.Loading;
 
+            await DbInitializer.EnsureInitializeAsync();
+
             var result = await _botService.ConnectAsync();
-            _eventAggregator.GetEvent<ConnectedToServerEvent>().Publish(result);
+            _eventAggregator.GetEvent<InitializedEvent>().Publish(result);
         }
     }
 }

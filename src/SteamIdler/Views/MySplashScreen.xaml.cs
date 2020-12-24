@@ -18,7 +18,7 @@ namespace SteamIdler.Views
             InitializeComponent();
 
             _eventAggregator = ServiceLocator.Current.GetService<IEventAggregator>();
-            _eventAggregator.GetEvent<ConnectedToServerEvent>().Subscribe(result =>
+            _eventAggregator.GetEvent<InitializedEvent>().Subscribe(result =>
             {
                 DialogResult = true;
             });

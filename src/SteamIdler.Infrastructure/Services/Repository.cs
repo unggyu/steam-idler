@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace SteamIdler.Infrastructure.Services
 {
-    public class LocalRepository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : EntityBase<TKey> where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
+    public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : EntityBase<TKey> where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
     {
         private readonly IdlerContext _context;
 
-        public LocalRepository(IdlerContext context)
+        public Repository()
         {
-            _context = context;
+            _context = IdlerContext.Instance;
         }
 
         public virtual async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)

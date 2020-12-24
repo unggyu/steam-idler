@@ -47,13 +47,6 @@ namespace SteamIdler
                 Shutdown();
             }
 
-            var loginWindow = new LoginWindow();
-            var loginResult = loginWindow.ShowDialog();
-            if (loginResult == null || !loginResult.Value)
-            {
-                Shutdown();
-            }
-
             var mainWindow = new MainWindow();
             mainWindow.Show();
         }
