@@ -25,7 +25,8 @@ namespace SteamIdler.Views
 
             try
             {
-                await DbInitializer.EnsureInitializeAsync();
+                var initializer = DbInitializer.Instance;
+                await initializer.EnsureInitializeAsync();
             }
             catch (Exception ex)
             {
