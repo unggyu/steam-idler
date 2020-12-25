@@ -123,6 +123,12 @@
   <data name="AddAccount" xml:space="preserve">
     <value>계정 추가</value>
   </data>
+  <data name="AddApp" xml:space="preserve">
+    <value />
+  </data>
+  <data name="AppId" xml:space="preserve">
+    <value>앱 Id</value>
+  </data>
   <data name="AppSearch" xml:space="preserve">
     <value>앱 검색</value>
   </data>

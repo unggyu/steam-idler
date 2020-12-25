@@ -1,5 +1,4 @@
-﻿using SteamBot;
-using SteamIdler.Infrastructure.Exceptions;
+﻿using SteamIdler.Infrastructure.Exceptions;
 using SteamIdler.Infrastructure.Models;
 using System;
 using System.Collections.Generic;
@@ -27,15 +26,15 @@ namespace SteamIdler.Infrastructure.Services
         }
 
         private readonly Repository<Account, int> _accountRepository;
-        private readonly List<(Account, Bot)> _accountBotTuples;
+        private readonly List<(Account, SteamBot)> _accountBotTuples;
 
         public IdlingService()
         {
             _accountRepository = new Repository<Account, int>();
-            _accountBotTuples = new List<(Account, Bot)>();
+            _accountBotTuples = new List<(Account, SteamBot)>();
         }
 
-        public IEnumerable<Bot> Bots
+        public IEnumerable<SteamBot> Bots
         {
             get => _accountBotTuples.Select(t => t.Item2);
         }
@@ -58,22 +57,22 @@ namespace SteamIdler.Infrastructure.Services
 
             foreach (var account in accounts)
             {
-                var bot = AccountToBot(account);
+                var bot = new SteamBot(account);
                 _accountBotTuples.Add((account, bot));
             }
         }
 
-        public async Task AddBotAsync(Bot bot, bool startIdling = false, CancellationToken cancellationToken = default)
+        public async Task AddBotAsync(SteamBot bot, bool startIdling = false, CancellationToken cancellationToken = default)
         {
             if (bot == null)
             {
                 throw new ArgumentNullException(nameof(bot));
             }
 
-            var account = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(bot.LogOnDetails.Username));
+            var account = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(bot.LogOnDetails.Username), cancellationToken);
             if (account == null)
             {
-                throw new AccountNotFoundException();
+                throw new AccountNotFoundException(bot.LogOnDetails.Username);
             }
 
             _accountBotTuples.Add((account, bot));
@@ -92,7 +91,7 @@ namespace SteamIdler.Infrastructure.Services
             }
         }
 
-        public void StartIdling(string username)
+        public void StartIdling(string username, IEnumerable<App> apps = null)
         {
             if (username == null)
             {
@@ -108,10 +107,10 @@ namespace SteamIdler.Infrastructure.Services
                 throw new BotNotFoundException();
             }
 
-            StartIdling(bot);
+            StartIdling(bot, apps);
         }
 
-        public async void StartIdling(Bot bot)
+        public async void StartIdling(SteamBot bot, IEnumerable<App> apps = null)
         {
             if (bot == null)
             {
@@ -121,36 +120,25 @@ namespace SteamIdler.Infrastructure.Services
             var account = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(bot.LogOnDetails.Username));
             if (account == null)
             {
-                throw new AccountNotFoundException();
+                throw new AccountNotFoundException(bot.LogOnDetails.Username);
             }
 
-            var apps = account.AccountApps.Select(aa => aa.App);
+            if (apps == null)
+            {
+                apps = account.AccountApps.Select(aa => aa.App);
+            }
 
             // TODO: 아이들링 관련 코드 작성하면 됨
         }
 
-        public Bot GetBotByAccount(Account account)
+        public SteamBot GetBotByAccount(Account account)
         {
             return _accountBotTuples.FirstOrDefault(t => t.Item1.Equals(account)).Item2;
         }
 
-        public Account GetAccountByBot(Bot bot)
+        public Account GetAccountByBot(SteamBot bot)
         {
             return _accountBotTuples.FirstOrDefault(t => t.Item2.Equals(bot)).Item1;
-        }
-
-        private Bot AccountToBot(Account account)
-        {
-            if (account == null)
-            {
-                throw new ArgumentNullException(nameof(account));
-            }
-
-            var bot = new Bot();
-            bot.LogOnDetails.Username = account.Username;
-            bot.LogOnDetails.Password = account.Password;
-
-            return bot;
         }
     }
 }

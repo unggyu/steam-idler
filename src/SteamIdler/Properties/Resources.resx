@@ -123,6 +123,12 @@
   <data name="AddAccount" xml:space="preserve">
     <value>Add Account</value>
   </data>
+  <data name="AddApp" xml:space="preserve">
+    <value>Add App</value>
+  </data>
+  <data name="AppId" xml:space="preserve">
+    <value>App Id</value>
+  </data>
   <data name="AppSearch" xml:space="preserve">
     <value>App Search</value>
   </data>

@@ -15,5 +15,13 @@ namespace SteamIdler.Infrastructure.Tests
                 Assert.NotNull(appsEnumerator.Current);
             }
         }
+
+        [Fact]
+        public async void GetAppAsyncTest()
+        {
+            var repository = RemoteAppRepository.Instance;
+            var app = await repository.GetAppAsync(220);
+            Assert.NotNull(app);
+        }
     }
 }

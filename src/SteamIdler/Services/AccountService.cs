@@ -41,7 +41,7 @@ namespace SteamIdler.Services
                 return null;
             }
 
-            var bot = loginWindow.Bot;
+            var bot = loginWindow.SteamBot;
             var account = new Account
             {
                 Username = bot.LogOnDetails.Username,

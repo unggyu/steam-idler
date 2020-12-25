@@ -44,6 +44,8 @@ namespace SteamIdler.Infrastructure.Contexts
                 entity.Property(a => a.Id).HasColumnName(nameof(Account.Id).ToUnderscoreCase());
                 entity.Property(a => a.Username).HasColumnName(nameof(Account.Username).ToUnderscoreCase());
                 entity.Property(a => a.Password).HasColumnName(nameof(Account.Password).ToUnderscoreCase());
+                entity.Property(a => a.LoginKey).HasColumnName(nameof(Account.LoginKey).ToUnderscoreCase());
+                entity.Property(a => a.SentryFilePath).HasColumnName(nameof(Account.SentryFilePath).ToUnderscoreCase());
             });
 
             modelBuilder.Entity<App>().ToTable(nameof(Apps).ToUnderscoreCase());

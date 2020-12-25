@@ -7,6 +7,8 @@ namespace SteamIdler.Infrastructure.Models
     {
         private string _username;
         private string _password;
+        private string _loginKey;
+        private string _sentryFilePath;
         private ICollection<AccountApp> _accountApps;
 
         public string Username
@@ -19,6 +21,18 @@ namespace SteamIdler.Infrastructure.Models
         {
             get => _password;
             set => SetValue(ref _password, value);
+        }
+
+        public string LoginKey
+        {
+            get => _loginKey;
+            set => SetValue(ref _loginKey, value);
+        }
+
+        public string SentryFilePath
+        {
+            get => _sentryFilePath;
+            set => SetValue(ref _sentryFilePath, value);
         }
 
         public virtual ICollection<AccountApp> AccountApps
@@ -34,6 +48,8 @@ namespace SteamIdler.Infrastructure.Models
                 Id = Id,
                 Username = Username,
                 Password = Password,
+                LoginKey = LoginKey,
+                SentryFilePath = SentryFilePath,
                 AccountApps = AccountApps.Select(a => (AccountApp)a.Clone()).ToList()
             };
         }

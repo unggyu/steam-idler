@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28917.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamBot", "SteamBot\SteamBot.csproj", "{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamIdler", "SteamIdler\SteamIdler.csproj", "{DD05536A-A4BC-4520-94B1-A99DBC96999A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamIdler.Infrastructure", "SteamIdler.Infrastructure\SteamIdler.Infrastructure.csproj", "{CFF44D0A-48F3-495E-B440-C87163042DE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamIdler.Infrastructure.Tests", "SteamIdler.Infrastructure.Tests\SteamIdler.Infrastructure.Tests.csproj", "{E0F5F3B2-7BE4-4E49-B94B-DF28C63094B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SteamIdler.Infrastructure.Tests", "SteamIdler.Infrastructure.Tests\SteamIdler.Infrastructure.Tests.csproj", "{E0F5F3B2-7BE4-4E49-B94B-DF28C63094B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,30 +25,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|ARM.Build.0 = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|iPhone.ActiveCfg = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|iPhone.Build.0 = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|x64.Build.0 = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Debug|x86.Build.0 = Debug|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|ARM.ActiveCfg = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|ARM.Build.0 = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|iPhone.ActiveCfg = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|iPhone.Build.0 = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|x64.ActiveCfg = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|x64.Build.0 = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|x86.ActiveCfg = Release|Any CPU
-		{2AA9FFBA-4022-448E-89FF-E9F32EF2D5F7}.Release|x86.Build.0 = Release|Any CPU
 		{DD05536A-A4BC-4520-94B1-A99DBC96999A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DD05536A-A4BC-4520-94B1-A99DBC96999A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD05536A-A4BC-4520-94B1-A99DBC96999A}.Debug|ARM.ActiveCfg = Debug|Any CPU

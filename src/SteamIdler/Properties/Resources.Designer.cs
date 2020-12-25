@@ -79,6 +79,24 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Add App과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AddApp {
+            get {
+                return ResourceManager.GetString("AddApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   App Id과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AppId {
+            get {
+                return ResourceManager.GetString("AppId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   App Search과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string AppSearch {

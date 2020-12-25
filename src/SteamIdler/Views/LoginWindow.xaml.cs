@@ -4,7 +4,7 @@ using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using SteamIdler.Events;
 using SteamIdler.Infrastructure.Services;
-using SteamBot;
+using SteamIdler.Infrastructure;
 
 namespace SteamIdler.Views
 {
@@ -23,16 +23,16 @@ namespace SteamIdler.Views
             _eventAggregator = ServiceLocator.Current.GetService<IEventAggregator>();
             _eventAggregator.GetEvent<LoginSuccessfulEvent>().Subscribe(bot =>
             {
-                Bot = bot;
+                SteamBot = bot;
                 DialogResult = true;
             });
         }
 
-        public Bot Bot { get; set; }
+        public SteamBot SteamBot { get; set; }
 
         public void Initialize()
         {
-            var passwordService = PasswordService.Instance;
+            var passwordService = PasswordProvider.Instance;
             passwordService.GetPassword = CredentialInput.GetPassword;
         }
     }

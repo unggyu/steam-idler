@@ -1,41 +1,53 @@
-﻿using SteamKit2;
+﻿using SteamIdler.Infrastructure.Constants;
+using SteamIdler.Infrastructure.Exceptions;
+using SteamIdler.Infrastructure.Models;
+using SteamIdler.Infrastructure.Services;
+using SteamKit2;
+using SteamKit2.Internal;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SteamBot
+namespace SteamIdler.Infrastructure
 {
-    public class Bot : INotifyPropertyChanged
+    public class SteamBot
     {
         private readonly SteamClient _steamClient;
         private readonly CallbackManager _callbackManager;
         private readonly SteamUser _steamUser;
+        private readonly Repository<Account, int> _accountRepository;
+
+        private Account _account;
         private bool _isRunning;
         private EResult? _loggedOnResult;
         private CancellationTokenSource _tokenSource;
 
-        public Bot(string username, string password) : this()
+        public SteamBot(Account account) : this()
         {
-            LogOnDetails.Username = username;
-            LogOnDetails.Password = password;
+            if (account == null)
+            {
+                throw new ArgumentNullException(nameof(account));
+            }
+
+            Account = account;
         }
 
-        public Bot(string username, string password, string loginKey) : this(username, password)
-        {
-            LogOnDetails.LoginKey = loginKey;
-        }
-
-        public Bot()
+        public SteamBot()
         {
             _steamClient = new SteamClient();
             _callbackManager = new CallbackManager(_steamClient);
-
             _steamUser = _steamClient.GetHandler<SteamUser>();
+            _accountRepository = new Repository<Account, int>();
+
+            LogOnDetails = new SteamUser.LogOnDetails();
 
             _callbackManager.Subscribe<SteamClient.ConnectedCallback>(OnConnectedEventHandler);
             _callbackManager.Subscribe<SteamClient.DisconnectedCallback>(OnDisconnectedEventHandler);
@@ -43,6 +55,21 @@ namespace SteamBot
             _callbackManager.Subscribe<SteamUser.LoggedOffCallback>(OnLoggedOffEventHandler);
             _callbackManager.Subscribe<SteamUser.UpdateMachineAuthCallback>(OnUpdateMachineAuthEventHandler);
             _callbackManager.Subscribe<SteamUser.LoginKeyCallback>(OnLoginKeyEventHandler);
+        }
+
+        public Account Account
+        {
+            get => _account;
+            set
+            {
+                _account = value;
+
+                if (_account != null)
+                {
+                    LogOnDetails.Username = _account.Username;
+                    LogOnDetails.Password = _account.Password;
+                }
+            }
         }
 
         public bool IsRunning
@@ -69,7 +96,7 @@ namespace SteamBot
             }
         }
 
-        public SteamUser.LogOnDetails LogOnDetails { get; set; } = new SteamUser.LogOnDetails();
+        public SteamUser.LogOnDetails LogOnDetails { get; }
         public bool IsConnected => _steamClient.IsConnected;
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -116,14 +143,49 @@ namespace SteamBot
         {
             Debug.WriteLine("[Bot.cs] Login");
 
-            if (File.Exists("sentry.bin"))
+            if (_account != null)
             {
-                var sentryFile = File.ReadAllBytes("sentry.bin");
-
-                LogOnDetails.SentryFileHash = CryptoHelper.SHAHash(sentryFile);
+                if (File.Exists(_account.SentryFilePath))
+                {
+                    var sentryFile = File.ReadAllBytes(_account.SentryFilePath);
+                    LogOnDetails.SentryFileHash = CryptoHelper.SHAHash(sentryFile);
+                }
             }
 
             _steamUser.LogOn(LogOnDetails);
+        }
+
+        public void PlayApps(IEnumerable<App> apps = null)
+        {
+            if (apps == null)
+            {
+                if (_account == null)
+                {
+                    throw new ArgumentNullException(nameof(apps));
+                }
+
+                apps = _account.AccountApps.Select(aa => aa.App);
+            }
+
+            foreach (var app in apps)
+            {
+                PlayApp(app);
+            }
+        }
+
+        public void PlayApp(App app)
+        {
+            if (app == null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            var gamesPlayed = new ClientMsgProtobuf<CMsgClientGamesPlayed>(EMsg.ClientGamesPlayed);
+            gamesPlayed.Body.games_played.Add(new CMsgClientGamesPlayed.GamePlayed
+            {
+                game_id = (ulong)app.Id
+            });
+            _steamClient.Send(gamesPlayed);
         }
 
         private async Task WaitCallbacksAsync(CancellationToken cancellationToken = default)
@@ -187,23 +249,31 @@ namespace SteamBot
             LoggedOnResult = null;
         }
 
-        private void OnUpdateMachineAuthEventHandler(SteamUser.UpdateMachineAuthCallback callback)
+        private async void OnUpdateMachineAuthEventHandler(SteamUser.UpdateMachineAuthCallback callback)
         {
             int fileSize;
             byte[] sentryHash;
+            string sentryFilePath;
+            bool isCreatedSentryFile = false;
 
-            using (var fs = File.Open("sentry.bin", FileMode.OpenOrCreate, FileAccess.ReadWrite))
+            if (_account != null)
             {
-                fs.Seek(callback.Offset, SeekOrigin.Begin);
-                fs.Write(callback.Data, 0, callback.BytesToWrite);
-
-                fileSize = (int)fs.Length;
-
-                using (var sha = SHA1.Create())
-                {
-                    sentryHash = sha.ComputeHash(fs);
-                }
+                sentryFilePath = _account.SentryFilePath;
             }
+            else
+            {
+                isCreatedSentryFile = true;
+                sentryFilePath = Path.Combine(Directory.GetCurrentDirectory(), LocalFolderNames.Sentries, $"{Guid.NewGuid()}.bin");
+            }
+
+            using var fileStream = File.Open(sentryFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            fileStream.Seek(callback.Offset, SeekOrigin.Begin);
+            fileStream.Write(callback.Data, 0, callback.BytesToWrite);
+
+            fileSize = (int)fileStream.Length;
+
+            using var sha = SHA1.Create();
+            sentryHash = sha.ComputeHash(fileStream);
 
             _steamUser.SendMachineAuthResponse(new SteamUser.MachineAuthDetails
             {
@@ -222,11 +292,28 @@ namespace SteamBot
 
                 SentryFileHash = sentryHash
             });
+
+            if (isCreatedSentryFile && _account != null)
+            {
+                _account.SentryFilePath = sentryFilePath;
+                await _accountRepository.EditAsync(_account);
+            }
         }
 
-        private void OnLoginKeyEventHandler(SteamUser.LoginKeyCallback callback)
+        private async void OnLoginKeyEventHandler(SteamUser.LoginKeyCallback callback)
         {
             LogOnDetails.LoginKey = callback.LoginKey;
+
+            var account = Account ?? await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(LogOnDetails.Username));
+            if (account != null)
+            {
+                account.LoginKey = callback.LoginKey;
+                await _accountRepository.EditAsync(account);
+            }
+            else
+            {
+                throw new AccountNotFoundException(LogOnDetails.Username);
+            }
         }
     }
 }

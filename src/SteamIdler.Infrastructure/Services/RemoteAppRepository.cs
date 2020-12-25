@@ -1,8 +1,12 @@
-﻿using Flurl.Http;
+﻿using Flurl;
+using Flurl.Http;
+using Microsoft.AspNetCore.Routing;
+using SteamIdler.Infrastructure.Exceptions;
 using SteamIdler.Infrastructure.Models;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SteamIdler.Infrastructure.Services
 {
@@ -24,6 +28,7 @@ namespace SteamIdler.Infrastructure.Services
         }
 
         private const string GetAppListUrl = "https://api.steampowered.com/ISteamApps/GetAppList/v2/";
+        private const string GetAppDetailsUrl = "https://store.steampowered.com/api/appdetails";
 
         public async IAsyncEnumerable<App> GetAllAppsAsync([EnumeratorCancellation] CancellationToken cancellationToken = default)
         {
@@ -37,6 +42,35 @@ namespace SteamIdler.Infrastructure.Services
                     Id = (int)app.appid,
                     Name = app.name
                 };
+            }
+        }
+
+        public async Task<App> GetAppAsync(int appId, CancellationToken cancellationToken = default)
+        {
+            var result = await GetAppDetailsUrl
+                .SetQueryParam("appids", appId)
+                .GetJsonAsync(cancellationToken);
+
+            var dictionary = new RouteValueDictionary(result);
+            var realResult = (dynamic)dictionary["220"];
+            if (realResult != null)
+            {
+                if (realResult.success == false)
+                {
+                    throw new AppNotFoundException(appId);
+                }
+
+                var data = realResult.data;
+
+                return new App
+                {
+                    Id = (int)data.steam_appid,
+                    Name = data.name
+                };
+            }
+            else
+            {
+                throw new AppNotFoundException(appId);
             }
         }
     }

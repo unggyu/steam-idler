@@ -2,17 +2,17 @@
 
 namespace SteamIdler.Infrastructure.Services
 {
-    public class PasswordService
+    public class PasswordProvider
     {
-        private static PasswordService _instance;
+        private static PasswordProvider _instance;
 
-        public static PasswordService Instance
+        public static PasswordProvider Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = new PasswordService();
+                    _instance = new PasswordProvider();
                 }
 
                 return _instance;

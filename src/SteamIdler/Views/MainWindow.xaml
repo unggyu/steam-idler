@@ -1,4 +1,4 @@
-﻿<Window x:Class="SteamIdler.MainWindow"
+﻿<Window x:Class="SteamIdler.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -60,10 +60,23 @@
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <ui:AutoSuggestBox
-                Margin="10,0,10,10"
-                ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.AppSearch}"
-                Text="{Binding SearchKeyword, Mode=OneWayToSource}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox
+                    x:Name="AppIdTextBox"
+                    Margin="10,0,10,10"
+                    ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.AppId}"
+                    Text="{Binding AppId, Mode=OneWayToSource}"
+                    PreviewTextInput="AppIdTextBox_PreviewTextInput" />
+                <Button
+                    x:Name="AddAppButton"
+                    Grid.Column="1"
+                    Command="{Binding AddAppCommand}"
+                    ToolTip="{localize:Static properties:Resources.AddApp}" />
+            </Grid>
             <ListBox
                 x:Name="AppListBox"
                 Grid.Row="1"

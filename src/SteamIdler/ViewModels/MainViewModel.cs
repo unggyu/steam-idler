@@ -2,6 +2,7 @@
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Services;
 using SteamIdler.Services;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
@@ -11,21 +12,30 @@ namespace SteamIdler.ViewModels
     public class MainViewModel : ViewModelBase
     {
         private readonly Repository<Account, int> _accountRepository;
+        private readonly Repository<Infrastructure.Models.App, int> _appRepository;
+        private readonly RemoteAppRepository _remoteAppRepository;
         private readonly AccountService _accountService;
+        private readonly IdlingService _idlingService;
+
         private ObservableCollection<Account> _accounts;
         private ObservableCollection<Infrastructure.Models.App> _apps;
         private Account _selectedAccount;
         private App _selectedApp;
-        private string _searchKeyword;
+        private string _appId;
 
         public MainViewModel()
         {
             _accountRepository = new Repository<Account, int>();
+            _appRepository = new Repository<Infrastructure.Models.App, int>();
+            _remoteAppRepository = RemoteAppRepository.Instance;
             _accountService = AccountService.Instance;
+            _idlingService = IdlingService.Instance;
+
             Accounts = new ObservableCollection<Account>();
             Apps = new ObservableCollection<Infrastructure.Models.App>();
 
             AddAccountCommand = new DelegateCommand(AddAccount);
+            AddAppCommand = new DelegateCommand(AddApp);
 
             Initialize();
         }
@@ -58,13 +68,14 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _selectedApp, value);
         }
 
-        public string SearchKeyword
+        public string AppId
         {
-            get => _searchKeyword;
-            set => SetValue(ref _searchKeyword, value);
+            get => _appId;
+            set => SetValue(ref _appId, value);
         }
 
         public ICommand AddAccountCommand { get; }
+        public ICommand AddAppCommand { get; }
 
         private void Initialize()
         {
@@ -96,9 +107,14 @@ namespace SteamIdler.ViewModels
 
         private void LoadApps()
         {
+            if (SelectedAccount == null)
+            {
+                return;
+            }
+
             Apps.Clear();
 
-            var apps = SelectedAccount?.AccountApps.Select(aa => aa.App);
+            var apps = SelectedAccount.AccountApps.Select(aa => aa.App);
             if (apps == null)
             {
                 return;
@@ -107,6 +123,35 @@ namespace SteamIdler.ViewModels
             foreach (var app in apps)
             {
                 Apps.Add(app);
+            }
+        }
+
+        private async void AddApp()
+        {
+            if (SelectedAccount == null || string.IsNullOrWhiteSpace(AppId))
+            {
+                return;
+            }
+
+            try
+            {
+                var appId = int.Parse(AppId);
+                var app = await _remoteAppRepository.GetAppAsync(appId);
+                if (app == null)
+                {
+                    throw new Exception($"{nameof(app)} is null.");
+                }
+
+                var appExists = await _appRepository.IsExistsAsync(a => a.Id == appId);
+                if (!appExists)
+                {
+                    await _appRepository.AddAsync(app);
+                }
+
+                LoadApps();
+            }
+            catch (Exception ex)
+            {
             }
         }
     }
