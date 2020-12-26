@@ -2,6 +2,7 @@
 using SteamIdler.Infrastructure.Helpers;
 using SteamIdler.Infrastructure.Services;
 using SteamKit2;
+using SteamKit2.Internal;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,6 +100,23 @@ namespace SteamIdler.Infrastructure
                 .Start(handler => steamBot.LoggedOn += handler,
                        () => steamBot.Login(),
                        handler => steamBot.LoggedOn -= handler,
+                       cancellationToken);
+
+            return result;
+        }
+
+        public static async Task<SteamUser.LoggedOffCallback> LogoutAsync(this SteamBot steamBot, CancellationToken cancellationToken = default)
+        {
+            if (steamBot == null)
+            {
+                throw new ArgumentNullException(nameof(steamBot));
+            }
+
+            var result = await TaskExt
+                .FromEvent<SteamUser.LoggedOffCallback>()
+                .Start(handler => steamBot.LoggedOff += handler,
+                       () => steamBot.Logout(),
+                       handler => steamBot.LoggedOff -= handler,
                        cancellationToken);
 
             return result;

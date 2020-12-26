@@ -32,6 +32,8 @@ namespace SteamIdler.Infrastructure.Services
         {
             _accountRepository = new Repository<Account, int>();
             _accountBotTuples = new List<(Account, SteamBot)>();
+
+            Initialize();
         }
 
         public IEnumerable<SteamBot> Bots
@@ -49,11 +51,11 @@ namespace SteamIdler.Infrastructure.Services
             get => _accountBotTuples.All(b => b.Item2.IsRunningApp);
         }
 
-        public async Task InitializeAsync(CancellationToken cancellationToken = default)
+        public async void Initialize()
         {
             _accountBotTuples.Clear();
 
-            var accounts = await _accountRepository.GetAllItemsAsync(cancellationToken);
+            var accounts = await _accountRepository.GetAllItemsAsync();
 
             foreach (var account in accounts)
             {
@@ -62,25 +64,41 @@ namespace SteamIdler.Infrastructure.Services
             }
         }
 
-        public async Task AddBotAsync(SteamBot bot, bool startIdling = false, CancellationToken cancellationToken = default)
+        public async Task AddBotAsync(SteamBot steamBot, bool startIdling = false, CancellationToken cancellationToken = default)
         {
-            if (bot == null)
+            if (steamBot == null)
             {
-                throw new ArgumentNullException(nameof(bot));
+                throw new ArgumentNullException(nameof(steamBot));
             }
 
-            var account = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(bot.LogOnDetails.Username), cancellationToken);
+            var account = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(steamBot.LogOnDetails.Username), cancellationToken);
             if (account == null)
             {
-                throw new AccountNotFoundException(bot.LogOnDetails.Username);
+                throw new AccountNotFoundException(steamBot.LogOnDetails.Username);
             }
 
-            _accountBotTuples.Add((account, bot));
+            _accountBotTuples.Add((account, steamBot));
 
             if (startIdling)
             {
-                StartIdling(bot);
+                StartIdling(steamBot);
             }
+        }
+
+        public async Task RemoveBotAsync(SteamBot steamBot, bool logout = true, CancellationToken cancellationToken = default)
+        {
+            if (steamBot == null)
+            {
+                throw new ArgumentNullException(nameof(steamBot));
+            }
+
+            if (logout && steamBot.IsConnected)
+            {
+                await steamBot.LogoutAsync(cancellationToken);
+            }
+
+            var tuple = _accountBotTuples.FirstOrDefault(t => t.Item2.Equals(steamBot));
+            _accountBotTuples.Remove(tuple);
         }
 
         public void StartIdling()

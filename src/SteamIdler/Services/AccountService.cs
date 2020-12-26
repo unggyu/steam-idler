@@ -1,6 +1,8 @@
-﻿using SteamIdler.Infrastructure.Models;
+﻿using SteamIdler.Infrastructure.Exceptions;
+using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Services;
 using SteamIdler.Views;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -53,6 +55,23 @@ namespace SteamIdler.Services
             var dbAccount = _idlingService.GetAccountByBot(bot);
 
             return dbAccount;
+        }
+
+        public async Task RemoveAccountAsync(Account account, bool logout = true, CancellationToken cancellationToken = default)
+        {
+            if (account == null)
+            {
+                throw new ArgumentNullException(nameof(account));
+            }
+
+            var steamBot = _idlingService.GetBotByAccount(account);
+            if (steamBot == null)
+            {
+                throw new SteamBotNotFoundException(account.Username);
+            }
+
+            await _idlingService.RemoveBotAsync(steamBot, logout, cancellationToken);
+            await _accountRepository.DeleteAsync(account, cancellationToken);
         }
     }
 }

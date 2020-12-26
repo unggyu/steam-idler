@@ -18,5 +18,10 @@ namespace SteamIdler.Views
         {
             e.Handled = !RegexHelper.IsNumeric(e.Text);
         }
+
+        private void Window_Closed(object sender, System.EventArgs e)
+        {
+            App.Current.Shutdown();
+        }
     }
 }

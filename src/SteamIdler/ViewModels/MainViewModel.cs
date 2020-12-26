@@ -37,9 +37,9 @@ namespace SteamIdler.ViewModels
             Apps = new ObservableCollection<Infrastructure.Models.App>();
 
             AddAccountCommand = new DelegateCommand(AddAccount);
+            RemoveAccountCommand = new DelegateCommand<object>(DeleteAccount);
             AddAppCommand = new DelegateCommand(AddApp);
-            DeleteAppCommand = new DelegateCommand(DeleteApp);
-            DeleteAppWithParameterCommand = new DelegateCommand<object>(DeleteAppWithParameter);
+            RemoveAppCommand = new DelegateCommand<object>(DeleteApp);
 
             Initialize();
         }
@@ -79,9 +79,9 @@ namespace SteamIdler.ViewModels
         }
 
         public ICommand AddAccountCommand { get; }
+        public ICommand RemoveAccountCommand { get; }
         public ICommand AddAppCommand { get; }
-        public ICommand DeleteAppCommand { get; }
-        public ICommand DeleteAppWithParameterCommand { get; }
+        public ICommand RemoveAppCommand { get; }
 
         private void Initialize()
         {
@@ -114,6 +114,28 @@ namespace SteamIdler.ViewModels
             }
 
             LoadAccounts();
+        }
+
+        private async void DeleteAccount(object account)
+        {
+            if (account == null || !(account is Account castedAccount))
+            {
+                return;
+            }
+
+            try
+            {
+                // TODO: 해당 계정의 앱들 중 아이들링을 하고 있는 앱이 있다면 꺼주고 계정이 로그인 되어있는 상태라면 로그아웃 해야함
+
+                await _accountService.RemoveAccountAsync(castedAccount);
+                
+
+                LoadAccounts();
+                LoadApps();
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         private async void LoadApps(int? appIdToChoose = null)
@@ -190,12 +212,7 @@ namespace SteamIdler.ViewModels
             }
         }
 
-        private void DeleteApp()
-        {
-            DeleteAppWithParameter(SelectedApp);
-        }
-
-        private async void DeleteAppWithParameter(object app)
+        private async void DeleteApp(object app)
         {
             if (app == null || !(app is Infrastructure.Models.App castedApp))
             {

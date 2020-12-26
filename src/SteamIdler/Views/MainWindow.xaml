@@ -12,8 +12,10 @@
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
+        Height="900" Width="1600"
+        Closed="Window_Closed"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
-        Title="{localize:Static properties:Resources.SteamIdler}" Height="900" Width="1600">
+        Title="{localize:Static properties:Resources.SteamIdler}">
     <Window.Resources>
         <helpers:BindingProxy x:Key="MainWindowProxy" Data="{Binding}" />
         <Style TargetType="{x:Type HeaderedContentControl}">
@@ -68,6 +70,14 @@
                         <TextBlock Text="{Binding Username, Mode=OneWay}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem
+                            Header="{localize:Static properties:Resources.RemoveAccount}"
+                            Command="{Binding RemoveAccountCommand}"
+                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                    </ContextMenu>
+                </ListBox.ContextMenu>
             </ListBox>
         </HeaderedContentControl>
         <Grid Grid.Column="1">
@@ -84,8 +94,12 @@
                 <TextBox
                     x:Name="AppIdTextBox"
                     ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.AppId}"
-                    Text="{Binding AppId, Mode=TwoWay}"
-                    PreviewTextInput="AppIdTextBox_PreviewTextInput" />
+                    Text="{Binding AppId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PreviewTextInput="AppIdTextBox_PreviewTextInput">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Return" Command="{Binding AddAppCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
                 <Button
                     x:Name="AddAppButton"
                     Grid.Column="1"
@@ -114,8 +128,9 @@
                     <ListBox.ContextMenu>
                         <ContextMenu>
                             <MenuItem
-                                Header="{localize:Static properties:Resources.DeleteApp}"
-                                Command="{Binding DeleteAppCommand}" />
+                                Header="{localize:Static properties:Resources.RemoveApp}"
+                                Command="{Binding RemoveAppCommand}"
+                                CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
                         </ContextMenu>
                     </ListBox.ContextMenu>
                     <ListBox.ItemContainerStyle>
@@ -138,7 +153,7 @@
                                     fa:Awesome.Content="Trash"
                                     Background="Red"
                                     Width="50"
-                                    Command="{Binding Data.DeleteAppWithParameterCommand, Source={StaticResource MainWindowProxy}}"
+                                    Command="{Binding Data.RemoveAppCommand, Source={StaticResource MainWindowProxy}}"
                                     CommandParameter="{Binding}">
                                     <Button.Style>
                                         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">

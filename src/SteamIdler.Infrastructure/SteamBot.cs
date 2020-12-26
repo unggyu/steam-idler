@@ -149,6 +149,13 @@ namespace SteamIdler.Infrastructure
             _steamUser.LogOn(LogOnDetails);
         }
 
+        public void Logout()
+        {
+            Debug.WriteLine("[Bot.cs] Logout");
+
+            _isRunning = false;
+        }
+
         public void PlayApps(IEnumerable<App> apps = null)
         {
             if (apps == null)
