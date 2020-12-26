@@ -5,7 +5,6 @@ using SteamIdler.Infrastructure.Services;
 using SteamKit2;
 using SteamKit2.Internal;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -32,12 +31,7 @@ namespace SteamIdler.Infrastructure
 
         public SteamBot(Account account) : this()
         {
-            if (account == null)
-            {
-                throw new ArgumentNullException(nameof(account));
-            }
-
-            Account = account;
+            Account = account ?? throw new ArgumentNullException(nameof(account));
         }
 
         public SteamBot()

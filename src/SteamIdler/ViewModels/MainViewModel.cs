@@ -21,7 +21,7 @@ namespace SteamIdler.ViewModels
         private ObservableCollection<Account> _accounts;
         private ObservableCollection<Infrastructure.Models.App> _apps;
         private Account _selectedAccount;
-        private App _selectedApp;
+        private Infrastructure.Models.App _selectedApp;
         private string _appId;
 
         public MainViewModel()
@@ -38,6 +38,8 @@ namespace SteamIdler.ViewModels
 
             AddAccountCommand = new DelegateCommand(AddAccount);
             AddAppCommand = new DelegateCommand(AddApp);
+            DeleteAppCommand = new DelegateCommand(DeleteApp);
+            DeleteAppWithParameterCommand = new DelegateCommand<object>(DeleteAppWithParameter);
 
             Initialize();
         }
@@ -64,7 +66,7 @@ namespace SteamIdler.ViewModels
             }
         }
 
-        public App SelectedApp
+        public Infrastructure.Models.App SelectedApp
         {
             get => _selectedApp;
             set => SetValue(ref _selectedApp, value);
@@ -78,6 +80,8 @@ namespace SteamIdler.ViewModels
 
         public ICommand AddAccountCommand { get; }
         public ICommand AddAppCommand { get; }
+        public ICommand DeleteAppCommand { get; }
+        public ICommand DeleteAppWithParameterCommand { get; }
 
         private void Initialize()
         {
@@ -94,6 +98,11 @@ namespace SteamIdler.ViewModels
             {
                 Accounts.Add(account);
             }
+
+            if (accounts.Count() > 0)
+            {
+                SelectedAccount = Accounts.FirstOrDefault();
+            }
         }
 
         private async void AddAccount()
@@ -107,7 +116,7 @@ namespace SteamIdler.ViewModels
             LoadAccounts();
         }
 
-        private async void LoadApps()
+        private async void LoadApps(int? appIdToChoose = null)
         {
             if (SelectedAccount == null)
             {
@@ -126,9 +135,18 @@ namespace SteamIdler.ViewModels
             foreach (var app in apps)
             {
                 if (app != null)
-                {    
+                {
                     Apps.Add(app);
                 }
+            }
+
+            if (appIdToChoose.HasValue)
+            {
+                SelectedApp = Apps.FirstOrDefault(a => a.Id == appIdToChoose.Value);
+            }
+            else if (Apps.Count() > 0)
+            {
+                SelectedApp = Apps.FirstOrDefault();
             }
         }
 
@@ -162,8 +180,41 @@ namespace SteamIdler.ViewModels
                         AppId = app.Id
                     });
 
-                    LoadApps();
+                    LoadApps(appId);
+
+                    AppId = string.Empty;
                 }
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private void DeleteApp()
+        {
+            DeleteAppWithParameter(SelectedApp);
+        }
+
+        private async void DeleteAppWithParameter(object app)
+        {
+            if (app == null || !(app is Infrastructure.Models.App castedApp))
+            {
+                return;
+            }
+
+            try
+            {
+                // TODO: 만약 해당 앱이 실행 중이라면 종료시켜야함
+
+                var accountApp = await _accountAppRepository.GetFirstItemAsync(aa => aa.AccountId == SelectedAccount.Id && aa.AppId == castedApp.Id);
+                if (accountApp == null)
+                {
+                    return;
+                }
+
+                await _accountAppRepository.DeleteAsync(accountApp);
+
+                LoadApps();
             }
             catch (Exception ex)
             {

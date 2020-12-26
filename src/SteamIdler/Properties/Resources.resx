@@ -138,6 +138,9 @@
   <data name="AuthCode" xml:space="preserve">
     <value>Auth Code</value>
   </data>
+  <data name="DeleteApp" xml:space="preserve">
+    <value>Delete App</value>
+  </data>
   <data name="Id" xml:space="preserve">
     <value>Id</value>
   </data>

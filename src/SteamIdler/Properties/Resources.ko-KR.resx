@@ -138,6 +138,9 @@
   <data name="AuthCode" xml:space="preserve">
     <value>인증 코드</value>
   </data>
+  <data name="DeleteApp" xml:space="preserve">
+    <value>앱 제거</value>
+  </data>
   <data name="Id" xml:space="preserve">
     <value>아이디</value>
   </data>

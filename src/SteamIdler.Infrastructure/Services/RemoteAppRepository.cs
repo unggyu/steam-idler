@@ -52,7 +52,7 @@ namespace SteamIdler.Infrastructure.Services
                 .GetJsonAsync(cancellationToken);
 
             var dictionary = new RouteValueDictionary(result);
-            var realResult = (dynamic)dictionary["220"];
+            var realResult = (dynamic)dictionary[appId.ToString()];
             if (realResult != null)
             {
                 if (realResult.success == false)

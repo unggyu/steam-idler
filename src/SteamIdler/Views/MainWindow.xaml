@@ -8,12 +8,14 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:models="clr-namespace:SteamIdler.Infrastructure.Models;assembly=SteamIdler.Infrastructure"
+        xmlns:helpers="clr-namespace:SteamIdler.Helpers"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
         Title="{localize:Static properties:Resources.SteamIdler}" Height="900" Width="1600">
     <Window.Resources>
+        <helpers:BindingProxy x:Key="MainWindowProxy" Data="{Binding}" />
         <Style TargetType="{x:Type HeaderedContentControl}">
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
             <Setter Property="Template">
@@ -82,7 +84,7 @@
                 <TextBox
                     x:Name="AppIdTextBox"
                     ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.AppId}"
-                    Text="{Binding AppId, Mode=OneWayToSource}"
+                    Text="{Binding AppId, Mode=TwoWay}"
                     PreviewTextInput="AppIdTextBox_PreviewTextInput" />
                 <Button
                     x:Name="AddAppButton"
@@ -107,7 +109,72 @@
                 <ListBox
                     x:Name="AppListBox"
                     ItemsSource="{Binding Apps}"
-                    DisplayMemberPath="Name" />
+                    SelectedItem="{Binding SelectedApp}"
+                    HorizontalContentAlignment="Stretch">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem
+                                Header="{localize:Static properties:Resources.DeleteApp}"
+                                Command="{Binding DeleteAppCommand}" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:App}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Name}" />
+                                <Button
+                                    Grid.Column="1"
+                                    fa:Awesome.Content="Trash"
+                                    Background="Red"
+                                    Width="50"
+                                    Command="{Binding Data.DeleteAppWithParameterCommand, Source={StaticResource MainWindowProxy}}"
+                                    CommandParameter="{Binding}">
+                                    <Button.Style>
+                                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Trigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation
+                                                                    Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                                                    To="DarkRed"
+                                                                    Duration="0:0:0:0.250" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.EnterActions>
+                                                </Trigger>
+                                                <Trigger Property="IsMouseOver" Value="False">
+                                                    <Trigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <ColorAnimation
+                                                                    Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                                                    To="Red"
+                                                                    Duration="0:0:0:0.250" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.EnterActions>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
             </HeaderedContentControl>
             <Button
                 x:Name="StartIdlingButton"

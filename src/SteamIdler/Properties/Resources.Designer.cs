@@ -124,6 +124,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Delete App과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string DeleteApp {
+            get {
+                return ResourceManager.GetString("DeleteApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Id과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string Id {
