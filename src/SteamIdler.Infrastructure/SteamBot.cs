@@ -263,7 +263,12 @@ namespace SteamIdler.Infrastructure
             else
             {
                 isCreatedSentryFile = true;
-                sentryFilePath = Path.Combine(Directory.GetCurrentDirectory(), LocalFolderNames.Sentries, $"{Guid.NewGuid()}.bin");
+                var sentryFolderPath = Path.Combine(Directory.GetCurrentDirectory(), LocalFolderNames.Sentries);
+                sentryFilePath = Path.Combine(sentryFolderPath, $"{Guid.NewGuid()}.bin");
+                if (!Directory.Exists(sentryFolderPath))
+                {
+                    Directory.CreateDirectory(sentryFolderPath);
+                }
             }
 
             using var fileStream = File.Open(sentryFilePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);

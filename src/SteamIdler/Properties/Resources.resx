@@ -129,6 +129,9 @@
   <data name="AppId" xml:space="preserve">
     <value>App Id</value>
   </data>
+  <data name="AppList" xml:space="preserve">
+    <value>AppList</value>
+  </data>
   <data name="AppSearch" xml:space="preserve">
     <value>App Search</value>
   </data>

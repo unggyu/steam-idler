@@ -6,7 +6,7 @@ namespace SteamIdler.Infrastructure.Helpers
     {
         public static bool IsNumeric(string value)
         {
-            return Regex.IsMatch("^[0-9]+$", value);
+            return Regex.IsMatch(value, "^[0-9]+$");
         }
     }
 }

@@ -13,6 +13,7 @@ namespace SteamIdler.ViewModels
     {
         private readonly Repository<Account, int> _accountRepository;
         private readonly Repository<Infrastructure.Models.App, int> _appRepository;
+        private readonly Repository<AccountApp, int> _accountAppRepository;
         private readonly RemoteAppRepository _remoteAppRepository;
         private readonly AccountService _accountService;
         private readonly IdlingService _idlingService;
@@ -27,6 +28,7 @@ namespace SteamIdler.ViewModels
         {
             _accountRepository = new Repository<Account, int>();
             _appRepository = new Repository<Infrastructure.Models.App, int>();
+            _accountAppRepository = new Repository<AccountApp, int>();
             _remoteAppRepository = RemoteAppRepository.Instance;
             _accountService = AccountService.Instance;
             _idlingService = IdlingService.Instance;
@@ -105,7 +107,7 @@ namespace SteamIdler.ViewModels
             LoadAccounts();
         }
 
-        private void LoadApps()
+        private async void LoadApps()
         {
             if (SelectedAccount == null)
             {
@@ -114,15 +116,19 @@ namespace SteamIdler.ViewModels
 
             Apps.Clear();
 
-            var apps = SelectedAccount.AccountApps.Select(aa => aa.App);
-            if (apps == null)
+            var accountApps = await _accountAppRepository.GetItemsAsync(aa => aa.AccountId == SelectedAccount.Id);
+            if (accountApps == null)
             {
                 return;
             }
 
+            var apps = accountApps.Select(aa => aa.App);
             foreach (var app in apps)
             {
-                Apps.Add(app);
+                if (app != null)
+                {    
+                    Apps.Add(app);
+                }
             }
         }
 
@@ -147,8 +153,17 @@ namespace SteamIdler.ViewModels
                 {
                     await _appRepository.AddAsync(app);
                 }
+                var accountAppExists = await _accountAppRepository.IsExistsAsync(aa => aa.AccountId == SelectedAccount.Id && aa.AppId == app.Id);
+                if (!accountAppExists)
+                {
+                    await _accountAppRepository.AddAsync(new AccountApp
+                    {
+                        AccountId = SelectedAccount.Id,
+                        AppId = app.Id
+                    });
 
-                LoadApps();
+                    LoadApps();
+                }
             }
             catch (Exception ex)
             {

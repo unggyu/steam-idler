@@ -13,80 +13,107 @@
         WindowStartupLocation="CenterScreen"
         DataContext="{Binding Main, Source={StaticResource Locator}}"
         Title="{localize:Static properties:Resources.SteamIdler}" Height="900" Width="1600">
+    <Window.Resources>
+        <Style TargetType="{x:Type HeaderedContentControl}">
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type HeaderedContentControl}">
+                        <DockPanel>
+                            <ContentPresenter DockPanel.Dock="Top" ContentSource="Header" />
+                            <ContentPresenter VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </DockPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width=".5*" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock
-                    Margin="5,0,5,5"
-                    FontSize="16"
-                    VerticalAlignment="Center"
-                    Text="{localize:Static properties:Resources.AccountList}" />
-                <Button
-                    x:Name="AddAccountButton"
-                    fa:Awesome.Content="UserPlus"
-                    Grid.Column="1"
-                    Width="50"
-                    HorizontalAlignment="Right"
-                    Margin="5,0,0,5"
-                    ToolTip="{localize:Static properties:Resources.AddAccount}"
-                    Command="{Binding AddAccountCommand}" />
-            </Grid>
+        <HeaderedContentControl Margin="0,5,0,0">
+            <HeaderedContentControl.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Margin="5,0,5,5"
+                        FontSize="16"
+                        VerticalAlignment="Center"
+                        Text="{localize:Static properties:Resources.AccountList}" />
+                    <Button
+                        x:Name="AddAccountButton"
+                        fa:Awesome.Content="UserPlus"
+                        Grid.Column="1"
+                        Width="50"
+                        HorizontalAlignment="Right"
+                        Margin="5,0,0,5"
+                        ToolTip="{localize:Static properties:Resources.AddAccount}"
+                        Command="{Binding AddAccountCommand}" />
+                </Grid>
+            </HeaderedContentControl.Header>
             <ListBox
                 x:Name="AccountListBox"
                 Grid.Row="1"
-                ItemsSource="{Binding Accounts}">
+                ItemsSource="{Binding Accounts}"
+                SelectedItem="{Binding SelectedAccount}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:Account}">
                         <TextBlock Text="{Binding Username, Mode=OneWay}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-        </Grid>
+        </HeaderedContentControl>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid>
+            <Grid Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBox
                     x:Name="AppIdTextBox"
-                    Margin="10,0,10,10"
                     ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.AppId}"
                     Text="{Binding AppId, Mode=OneWayToSource}"
                     PreviewTextInput="AppIdTextBox_PreviewTextInput" />
                 <Button
                     x:Name="AddAppButton"
                     Grid.Column="1"
+                    fa:Awesome.Content="Plus"
+                    VerticalAlignment="Center"
+                    Margin="5,0,5,0"
+                    Width="40"
+                    Height="40"
                     Command="{Binding AddAppCommand}"
                     ToolTip="{localize:Static properties:Resources.AddApp}" />
             </Grid>
-            <ListBox
-                x:Name="AppListBox"
+            <HeaderedContentControl
                 Grid.Row="1"
-                Margin="10,0,10,0"
-                ItemsSource="{Binding Apps}" />
+                Margin="5,0,5,0">
+                <HeaderedContentControl.Header>
+                    <TextBlock
+                        FontSize="16"
+                        Margin="0,5,0,5"
+                        Text="{localize:Static properties:Resources.AppList}" />
+                </HeaderedContentControl.Header>
+                <ListBox
+                    x:Name="AppListBox"
+                    ItemsSource="{Binding Apps}"
+                    DisplayMemberPath="Name" />
+            </HeaderedContentControl>
             <Button
                 x:Name="StartIdlingButton"
                 Grid.Row="2"
                 HorizontalAlignment="Stretch"
-                Margin="10"
+                Margin="5"
                 Content="{localize:Static properties:Resources.StartIdling}" />
         </Grid>
     </Grid>
