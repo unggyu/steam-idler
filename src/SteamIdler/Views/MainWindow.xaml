@@ -9,6 +9,7 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:models="clr-namespace:SteamIdler.Infrastructure.Models;assembly=SteamIdler.Infrastructure"
         xmlns:helpers="clr-namespace:SteamIdler.Helpers"
+        xmlns:uc="clr-namespace:SteamIdler.Views.UserControls"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True"
         WindowStartupLocation="CenterScreen"
@@ -63,15 +64,68 @@
             <ListBox
                 x:Name="AccountListBox"
                 Grid.Row="1"
+                HorizontalContentAlignment="Stretch"
                 ItemsSource="{Binding Accounts}"
                 SelectedItem="{Binding SelectedAccount}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:Account}">
-                        <TextBlock Text="{Binding Username, Mode=OneWay}" />
+                    <DataTemplate DataType="{x:Type models:SteamAccount}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Text="{Binding Account.Username, Mode=OneWay}" />
+                            <Grid
+                                Grid.Column="1"
+                                Margin="0,0,10,0"
+                                Visibility="{Binding IsCodeRequired, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsed}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox
+                                    x:Name="CodeTextBox"
+                                    Margin="0,0,5,0"
+                                    Text="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.Style>
+                                        <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CodeType}" Value="Auth">
+                                                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="{localize:Static properties:Resources.AuthCode}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding CodeType}" Value="TwoFactor">
+                                                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="{localize:Static properties:Resources.TwoFactorCode}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                                <Button
+                                    Grid.Column="1"
+                                    Content="{localize:Static properties:Resources.SignIn}"
+                                    Command="{Binding Data.SignInCommand, Source={StaticResource MainWindowProxy}}"
+                                    CommandParameter="{Binding}" />
+                            </Grid>
+                            <uc:BotLoginStatus
+                                Grid.Column="2"
+                                VerticalAlignment="Center"
+                                Bot="{Binding SteamBot}" />
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.ContextMenu>
                     <ContextMenu>
+                        <MenuItem
+                            Header="{localize:Static properties:Resources.SignIn}"
+                            Command="{Binding SignInCommand}"
+                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
                         <MenuItem
                             Header="{localize:Static properties:Resources.RemoveAccount}"
                             Command="{Binding RemoveAccountCommand}"

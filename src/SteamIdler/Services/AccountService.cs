@@ -34,7 +34,7 @@ namespace SteamIdler.Services
             _accountRepository = new Repository<Account, int>();
         }
 
-        public async Task<Account> AddAccountAsync(CancellationToken cancellationToken = default)
+        public async Task<SteamAccount> AddAccountAsync(CancellationToken cancellationToken = default)
         {
             var loginWindow = new LoginWindow();
             var result = loginWindow.ShowDialog();
@@ -51,27 +51,26 @@ namespace SteamIdler.Services
             };
             await _accountRepository.AddAsync(account, cancellationToken);
 
-            await _idlingService.AddBotAsync(bot, cancellationToken: cancellationToken);
-            var dbAccount = _idlingService.GetAccountByBot(bot);
+            var dbAccount = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(account), cancellationToken);
+            var steamAccount = new SteamAccount
+            {
+                Account = dbAccount,
+                SteamBot = bot
+            };
+            _idlingService.AddAccount(steamAccount);
 
-            return dbAccount;
+            return steamAccount;
         }
 
-        public async Task RemoveAccountAsync(Account account, bool logout = true, CancellationToken cancellationToken = default)
+        public async Task RemoveAccountAsync(SteamAccount account, bool logout = true, CancellationToken cancellationToken = default)
         {
             if (account == null)
             {
                 throw new ArgumentNullException(nameof(account));
             }
 
-            var steamBot = _idlingService.GetBotByAccount(account);
-            if (steamBot == null)
-            {
-                throw new SteamBotNotFoundException(account.Username);
-            }
-
-            await _idlingService.RemoveBotAsync(steamBot, logout, cancellationToken);
-            await _accountRepository.DeleteAsync(account, cancellationToken);
+            await _idlingService.RemoveAccountAsync(account, logout, cancellationToken);
+            await _accountRepository.DeleteAsync(account.Account, cancellationToken);
         }
     }
 }

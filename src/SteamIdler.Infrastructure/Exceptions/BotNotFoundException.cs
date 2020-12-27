@@ -4,16 +4,21 @@ namespace SteamIdler.Infrastructure.Exceptions
 {
     public class BotNotFoundException : Exception
     {
-        public BotNotFoundException()
+        public BotNotFoundException(string username)
         {
+            Username = username;
         }
 
-        public BotNotFoundException(string message) : base(message)
+        public BotNotFoundException(string username, string message) : base(message)
         {
+            Username = username;
         }
 
-        public BotNotFoundException(string message, Exception innerException) : base(message, innerException)
+        public BotNotFoundException(string username, string message, Exception innerException) : base(message, innerException)
         {
+            Username = username;
         }
+
+        public string Username { get; }
     }
 }

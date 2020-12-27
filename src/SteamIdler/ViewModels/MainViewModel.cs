@@ -1,7 +1,10 @@
 ﻿using Prism.Commands;
+using SteamIdler.Infrastructure;
+using SteamIdler.Infrastructure.Constants;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Services;
 using SteamIdler.Services;
+using SteamKit2;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -18,9 +21,9 @@ namespace SteamIdler.ViewModels
         private readonly AccountService _accountService;
         private readonly IdlingService _idlingService;
 
-        private ObservableCollection<Account> _accounts;
+        private ObservableCollection<SteamAccount> _accounts;
         private ObservableCollection<Infrastructure.Models.App> _apps;
-        private Account _selectedAccount;
+        private SteamAccount _selectedAccount;
         private Infrastructure.Models.App _selectedApp;
         private string _appId;
 
@@ -33,18 +36,19 @@ namespace SteamIdler.ViewModels
             _accountService = AccountService.Instance;
             _idlingService = IdlingService.Instance;
 
-            Accounts = new ObservableCollection<Account>();
+            Accounts = new ObservableCollection<SteamAccount>();
             Apps = new ObservableCollection<Infrastructure.Models.App>();
 
             AddAccountCommand = new DelegateCommand(AddAccount);
             RemoveAccountCommand = new DelegateCommand<object>(DeleteAccount);
+            SignInCommand = new DelegateCommand<object>(SignIn);
             AddAppCommand = new DelegateCommand(AddApp);
             RemoveAppCommand = new DelegateCommand<object>(DeleteApp);
 
             Initialize();
         }
 
-        public ObservableCollection<Account> Accounts
+        public ObservableCollection<SteamAccount> Accounts
         {
             get => _accounts;
             set => SetValue(ref _accounts, value);
@@ -56,7 +60,7 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _apps, value);
         }
 
-        public Account SelectedAccount
+        public SteamAccount SelectedAccount
         {
             get => _selectedAccount;
             set
@@ -80,6 +84,7 @@ namespace SteamIdler.ViewModels
 
         public ICommand AddAccountCommand { get; }
         public ICommand RemoveAccountCommand { get; }
+        public ICommand SignInCommand { get; }
         public ICommand AddAppCommand { get; }
         public ICommand RemoveAppCommand { get; }
 
@@ -96,7 +101,16 @@ namespace SteamIdler.ViewModels
 
             foreach (var account in accounts)
             {
-                Accounts.Add(account);
+                var steamBot = new SteamBot();
+                steamBot.LogOnDetails.Username = account.Username;
+                steamBot.LogOnDetails.Password = account.Password;
+                var steamAccount = new SteamAccount
+                {
+                    Account = account,
+                    SteamBot = steamBot
+                };
+
+                Accounts.Add(steamAccount);
             }
 
             if (accounts.Count() > 0)
@@ -116,25 +130,65 @@ namespace SteamIdler.ViewModels
             LoadAccounts();
         }
 
-        private async void DeleteAccount(object account)
+        private async void DeleteAccount(object obj)
         {
-            if (account == null || !(account is Account castedAccount))
+            if (obj == null || !(obj is SteamAccount account))
             {
                 return;
             }
 
             try
             {
-                // TODO: 해당 계정의 앱들 중 아이들링을 하고 있는 앱이 있다면 꺼주고 계정이 로그인 되어있는 상태라면 로그아웃 해야함
+                // TODO: 해당 계정의 앱들 중 아이들링을 하고 있는 앱이 있다면 아이들링을 중단시켜줘야함
 
-                await _accountService.RemoveAccountAsync(castedAccount);
-                
+                await _accountService.RemoveAccountAsync(account);
 
                 LoadAccounts();
                 LoadApps();
             }
             catch (Exception ex)
             {
+            }
+        }
+
+        private async void SignIn(object obj)
+        {
+            if (obj == null || !(obj is SteamAccount account))
+            {
+                return;
+            }
+
+            var result = await account.SteamBot.LoginAsync(
+                username: account.Account.Username,
+                password: account.Account.Password,
+                code: account.Code,
+                codeType: account.CodeType,
+                getPasswordByProvider: false);
+
+            switch (result.Result)
+            {
+                case EResult.OK:
+                    account.IsCodeRequired = false;
+                    account.Code = null;
+                    account.CodeType = null;
+                    break;
+                case EResult.AccountLogonDenied:
+                case EResult.AccountLogonDeniedVerifiedEmailRequired:
+                    await account.SteamBot.AwaitDisconnectAsync();
+                    await account.SteamBot.ConnectAsync();
+                    account.IsCodeRequired = true;
+                    account.CodeType = CodeType.Auth;
+                        break;
+                case EResult.AccountLoginDeniedNeedTwoFactor:
+                    await account.SteamBot.AwaitDisconnectAsync();
+                    await account.SteamBot.ConnectAsync();
+                    account.IsCodeRequired = true;
+                    account.CodeType = CodeType.TwoFactor;
+                    break;
+                default:
+                    await account.SteamBot.AwaitDisconnectAsync();
+                    await account.SteamBot.ConnectAsync();
+                    break;
             }
         }
 
@@ -147,7 +201,7 @@ namespace SteamIdler.ViewModels
 
             Apps.Clear();
 
-            var accountApps = await _accountAppRepository.GetItemsAsync(aa => aa.AccountId == SelectedAccount.Id);
+            var accountApps = await _accountAppRepository.GetItemsAsync(aa => aa.AccountId == SelectedAccount.Account.Id);
             if (accountApps == null)
             {
                 return;
@@ -193,12 +247,12 @@ namespace SteamIdler.ViewModels
                 {
                     await _appRepository.AddAsync(app);
                 }
-                var accountAppExists = await _accountAppRepository.IsExistsAsync(aa => aa.AccountId == SelectedAccount.Id && aa.AppId == app.Id);
+                var accountAppExists = await _accountAppRepository.IsExistsAsync(aa => aa.AccountId == SelectedAccount.Account.Id && aa.AppId == app.Id);
                 if (!accountAppExists)
                 {
                     await _accountAppRepository.AddAsync(new AccountApp
                     {
-                        AccountId = SelectedAccount.Id,
+                        AccountId = SelectedAccount.Account.Id,
                         AppId = app.Id
                     });
 
@@ -223,7 +277,7 @@ namespace SteamIdler.ViewModels
             {
                 // TODO: 만약 해당 앱이 실행 중이라면 종료시켜야함
 
-                var accountApp = await _accountAppRepository.GetFirstItemAsync(aa => aa.AccountId == SelectedAccount.Id && aa.AppId == castedApp.Id);
+                var accountApp = await _accountAppRepository.GetFirstItemAsync(aa => aa.AccountId == SelectedAccount.Account.Id && aa.AppId == castedApp.Id);
                 if (accountApp == null)
                 {
                     return;

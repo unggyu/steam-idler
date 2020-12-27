@@ -2,7 +2,6 @@
 using SteamIdler.Infrastructure.Helpers;
 using SteamIdler.Infrastructure.Services;
 using SteamKit2;
-using SteamKit2.Internal;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,7 +10,12 @@ namespace SteamIdler.Infrastructure
 {
     public static class SteamBotExtensions
     {
-        private static readonly PasswordProvider _passwordProvider = PasswordProvider.Instance;
+        private static readonly PasswordProvider _passwordProvider;
+
+        static SteamBotExtensions()
+        {
+            _passwordProvider = PasswordProvider.Instance;
+        }
 
         public static async Task<SteamClient.ConnectedCallback> ConnectAsync(this SteamBot steamBot, CancellationToken cancellationToken = default)
         {
@@ -63,7 +67,7 @@ namespace SteamIdler.Infrastructure
             return result;
         }
 
-        public static async Task<SteamUser.LoggedOnCallback> LoginAsync(this SteamBot steamBot, string username, string code = null, CodeType? codeType = null, CancellationToken cancellationToken = default)
+        public static async Task<SteamUser.LoggedOnCallback> LoginAsync(this SteamBot steamBot, string username = null, string password = null, bool getPasswordByProvider = false, string code = null, CodeType? codeType = null, CancellationToken cancellationToken = default)
         {
             if (steamBot == null)
             {
@@ -75,13 +79,25 @@ namespace SteamIdler.Infrastructure
                 await steamBot.ConnectAsync(cancellationToken);
             }
 
-            steamBot.LogOnDetails.Username = username;
-            if (_passwordProvider.GetPassword == null)
+            if (username != null)
             {
-                throw new Exception("GetPassword function not found.");
+                steamBot.LogOnDetails.Username = username;
             }
 
-            steamBot.LogOnDetails.Password = _passwordProvider.GetPassword();
+            if (getPasswordByProvider)
+            {
+                if (_passwordProvider.GetPassword == null)
+                {
+                    throw new Exception("GetPassword function not found.");
+                }
+
+                steamBot.LogOnDetails.Password = _passwordProvider.GetPassword();
+            }
+            else if (password != null)
+            {
+                steamBot.LogOnDetails.Password = password;
+            }
+
             if (codeType.HasValue)
             {
                 switch (codeType)

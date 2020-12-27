@@ -79,7 +79,13 @@ namespace SteamIdler.ViewModels
             {
                 using var tcs = new CancellationTokenSource();
                 tcs.CancelAfter(10000);
-                var loginResult = await _steamBot.LoginAsync(Username, Code, CodeType ?? null, tcs.Token);
+                var loginResult = await _steamBot.LoginAsync(
+                    username: Username,
+                    getPasswordByProvider: true,
+                    code: Code,
+                    codeType: CodeType ?? null,
+                    cancellationToken: tcs.Token);
+
                 switch (loginResult.Result)
                 {
                     case EResult.OK:

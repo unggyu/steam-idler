@@ -11,99 +11,98 @@ namespace SteamIdler.Infrastructure.Services
     public class IdlingService
     {
         private static IdlingService _instance;
-        
         public static IdlingService Instance
         {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new IdlingService();
-                }
+            get => _instance;
+        }
 
+        public static IdlingService FromAccounts(IEnumerable<SteamAccount> accounts)
+        {
+            if (_instance != null)
+            {
                 return _instance;
             }
+
+            var service = new IdlingService(accounts);
+            _instance = service;
+
+            return service;
         }
 
         private readonly Repository<Account, int> _accountRepository;
-        private readonly List<(Account, SteamBot)> _accountBotTuples;
+        private readonly List<SteamAccount> _steamAccounts;
 
-        public IdlingService()
+        private IdlingService(IEnumerable<SteamAccount> accounts)
         {
             _accountRepository = new Repository<Account, int>();
-            _accountBotTuples = new List<(Account, SteamBot)>();
-
-            Initialize();
+            _steamAccounts = new List<SteamAccount>(accounts ?? throw new ArgumentNullException(nameof(accounts)));
         }
 
-        public IEnumerable<SteamBot> Bots
+        public IEnumerable<SteamAccount> SteamAccounts
         {
-            get => _accountBotTuples.Select(t => t.Item2);
+            get => _steamAccounts;
         }
 
         public bool AllBotsAreRunning
         {
-            get => _accountBotTuples.All(t => t.Item2.IsRunning);
+            get => _steamAccounts.All(a => a.SteamBot.IsRunning);
         }
 
         public bool AllBotsAreIdling
         {
-            get => _accountBotTuples.All(b => b.Item2.IsRunningApp);
+            get => _steamAccounts.All(a => a.SteamBot.IsRunningApp);
         }
 
         public async void Initialize()
         {
-            _accountBotTuples.Clear();
+            _steamAccounts.Clear();
 
             var accounts = await _accountRepository.GetAllItemsAsync();
 
             foreach (var account in accounts)
             {
-                var bot = new SteamBot(account);
-                _accountBotTuples.Add((account, bot));
+                var steamAccount = new SteamAccount
+                {
+                    Account = account,
+                    SteamBot = new SteamBot()
+                };
+                _steamAccounts.Add(steamAccount);
             }
         }
 
-        public async Task AddBotAsync(SteamBot steamBot, bool startIdling = false, CancellationToken cancellationToken = default)
+        public void AddAccount(SteamAccount account, bool startIdling = false, CancellationToken cancellationToken = default)
         {
-            if (steamBot == null)
-            {
-                throw new ArgumentNullException(nameof(steamBot));
-            }
-
-            var account = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(steamBot.LogOnDetails.Username), cancellationToken);
             if (account == null)
             {
-                throw new AccountNotFoundException(steamBot.LogOnDetails.Username);
+                throw new ArgumentNullException(nameof(account));
             }
 
-            _accountBotTuples.Add((account, steamBot));
+            _steamAccounts.Add(account);
 
             if (startIdling)
             {
-                StartIdling(steamBot);
+                StartIdling(account.SteamBot);
             }
         }
 
-        public async Task RemoveBotAsync(SteamBot steamBot, bool logout = true, CancellationToken cancellationToken = default)
+        public async Task RemoveAccountAsync(SteamAccount account, bool logout = true, CancellationToken cancellationToken = default)
         {
-            if (steamBot == null)
+            if (account == null)
             {
-                throw new ArgumentNullException(nameof(steamBot));
+                throw new ArgumentNullException(nameof(account));
             }
 
-            if (logout && steamBot.IsConnected)
+            if (logout && account.SteamBot.IsConnected)
             {
-                await steamBot.LogoutAsync(cancellationToken);
+                await account.SteamBot.LogoutAsync(cancellationToken);
             }
 
-            var tuple = _accountBotTuples.FirstOrDefault(t => t.Item2.Equals(steamBot));
-            _accountBotTuples.Remove(tuple);
+            _steamAccounts.Remove(account);
         }
 
         public void StartIdling()
         {
-            foreach (var bot in _accountBotTuples.Select(t => t.Item2))
+            foreach (var bot in _steamAccounts.Select(t => t.SteamBot))
             {
                 StartIdling(bot);
             }
@@ -116,13 +115,13 @@ namespace SteamIdler.Infrastructure.Services
                 throw new ArgumentNullException(nameof(username));
             }
 
-            var bot = _accountBotTuples
-                .Select(t => t.Item2)
+            var bot = _steamAccounts
+                .Select(t => t.SteamBot)
                 .FirstOrDefault(b => b.LogOnDetails.Username.Equals(username));
 
             if (bot == null)
             {
-                throw new BotNotFoundException();
+                throw new BotNotFoundException(username);
             }
 
             StartIdling(bot, apps);
@@ -147,16 +146,6 @@ namespace SteamIdler.Infrastructure.Services
             }
 
             // TODO: 아이들링 관련 코드 작성하면 됨
-        }
-
-        public SteamBot GetBotByAccount(Account account)
-        {
-            return _accountBotTuples.FirstOrDefault(t => t.Item1.Equals(account)).Item2;
-        }
-
-        public Account GetAccountByBot(SteamBot bot)
-        {
-            return _accountBotTuples.FirstOrDefault(t => t.Item2.Equals(bot)).Item1;
         }
     }
 }

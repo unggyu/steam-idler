@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace SteamIdler.Infrastructure
 {
-    public class SteamBot
+    public class SteamBot : Bindable
     {
         private readonly SteamClient _steamClient;
         private readonly CallbackManager _callbackManager;
