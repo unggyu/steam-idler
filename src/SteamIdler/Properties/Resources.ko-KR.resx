@@ -156,6 +156,9 @@
   <data name="SignIn" xml:space="preserve">
     <value>로그인</value>
   </data>
+  <data name="SignOut" xml:space="preserve">
+    <value>로그아웃</value>
+  </data>
   <data name="StartIdling" xml:space="preserve">
     <value>아이들링 시작</value>
   </data>

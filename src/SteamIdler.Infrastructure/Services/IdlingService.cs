@@ -16,7 +16,7 @@ namespace SteamIdler.Infrastructure.Services
             get => _instance;
         }
 
-        public static IdlingService FromAccounts(IEnumerable<SteamAccount> accounts)
+        public static IdlingService FromAccounts(IEnumerable<SteamBot> accounts)
         {
             if (_instance != null)
             {
@@ -30,79 +30,62 @@ namespace SteamIdler.Infrastructure.Services
         }
 
         private readonly Repository<Account, int> _accountRepository;
-        private readonly List<SteamAccount> _steamAccounts;
+        private readonly List<SteamBot> _steamBots;
 
-        private IdlingService(IEnumerable<SteamAccount> accounts)
+        private IdlingService(IEnumerable<SteamBot> bots)
         {
             _accountRepository = new Repository<Account, int>();
-            _steamAccounts = new List<SteamAccount>(accounts ?? throw new ArgumentNullException(nameof(accounts)));
+            _steamBots = new List<SteamBot>(bots ?? throw new ArgumentNullException(nameof(bots)));
         }
 
-        public IEnumerable<SteamAccount> SteamAccounts
+        public IEnumerable<SteamBot> SteamAccounts
         {
-            get => _steamAccounts;
+            get => _steamBots;
         }
 
         public bool AllBotsAreRunning
         {
-            get => _steamAccounts.All(a => a.SteamBot.IsRunning);
+            get => _steamBots.All(a => a.IsRunning);
         }
 
         public bool AllBotsAreIdling
         {
-            get => _steamAccounts.All(a => a.SteamBot.IsRunningApp);
+            get => _steamBots.All(a => a.IsRunningApp);
         }
 
-        public async void Initialize()
+        public void AddBot(SteamBot steamBot, bool startIdling = false, CancellationToken cancellationToken = default)
         {
-            _steamAccounts.Clear();
-
-            var accounts = await _accountRepository.GetAllItemsAsync();
-
-            foreach (var account in accounts)
+            if (steamBot == null)
             {
-                var steamAccount = new SteamAccount
-                {
-                    Account = account,
-                    SteamBot = new SteamBot()
-                };
-                _steamAccounts.Add(steamAccount);
-            }
-        }
-
-        public void AddAccount(SteamAccount account, bool startIdling = false, CancellationToken cancellationToken = default)
-        {
-            if (account == null)
-            {
-                throw new ArgumentNullException(nameof(account));
+                throw new ArgumentNullException(nameof(steamBot));
             }
 
-            _steamAccounts.Add(account);
+            _steamBots.Add(steamBot);
 
             if (startIdling)
             {
-                StartIdling(account.SteamBot);
+                StartIdling(steamBot);
             }
         }
 
-        public async Task RemoveAccountAsync(SteamAccount account, bool logout = true, CancellationToken cancellationToken = default)
+        public async Task RemoveAccountAsync(SteamBot steamBot, bool logout = true, CancellationToken cancellationToken = default)
         {
-            if (account == null)
+            if (steamBot == null)
             {
-                throw new ArgumentNullException(nameof(account));
+                throw new ArgumentNullException(nameof(steamBot));
             }
 
-            if (logout && account.SteamBot.IsConnected)
+            if (logout && steamBot.IsConnected)
             {
-                await account.SteamBot.LogoutAsync(cancellationToken);
+                await steamBot.LogoutAsync(cancellationToken);
             }
 
-            _steamAccounts.Remove(account);
+            _steamBots.Remove(steamBot);
         }
 
         public void StartIdling()
         {
-            foreach (var bot in _steamAccounts.Select(t => t.SteamBot))
+            foreach (var bot in _steamBots)
             {
                 StartIdling(bot);
             }
@@ -115,8 +98,7 @@ namespace SteamIdler.Infrastructure.Services
                 throw new ArgumentNullException(nameof(username));
             }
 
-            var bot = _steamAccounts
-                .Select(t => t.SteamBot)
+            var bot = _steamBots
                 .FirstOrDefault(b => b.LogOnDetails.Username.Equals(username));
 
             if (bot == null)

@@ -3,6 +3,7 @@ using SteamIdler.Infrastructure.Exceptions;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Services;
 using SteamKit2;
+using SteamKit2.GC.CSGO.Internal;
 using SteamKit2.Internal;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace SteamIdler.Infrastructure
 {
-    public class SteamBot : Bindable
+    public class SteamBot : INotifyPropertyChanged
     {
         private readonly SteamClient _steamClient;
         private readonly CallbackManager _callbackManager;
@@ -26,7 +27,6 @@ namespace SteamIdler.Infrastructure
 
         private Account _account;
         private bool _isRunning;
-        private EResult? _loggedOnResult;
         private CancellationTokenSource _tokenSource;
 
         public SteamBot(Account account) : this()
@@ -51,24 +51,19 @@ namespace SteamIdler.Infrastructure
             _callbackManager.Subscribe<SteamUser.LoginKeyCallback>(OnLoginKeyEventHandler);
         }
 
-        public Account Account
+        public bool IsConnected
         {
-            get => _account;
-            set
-            {
-                _account = value;
-
-                if (_account != null)
-                {
-                    LogOnDetails.Username = _account.Username;
-                    LogOnDetails.Password = _account.Password;
-                }
-            }
+            get => _steamClient.IsConnected;
         }
 
         public bool IsRunning
         {
             get => _isRunning;
+        }
+
+        public bool IsLoggedOn
+        {
+            get => _steamUser.SteamID != null;
         }
 
         public bool IsRunningApp
@@ -80,18 +75,22 @@ namespace SteamIdler.Infrastructure
             }
         }
 
-        public EResult? LoggedOnResult
+        public Account Account
         {
-            get => _loggedOnResult;
+            get => _account;
             set
             {
-                _loggedOnResult = value;
-                OnPropertyChanged();
+                SetValue(ref _account, value);
+
+                if (_account != null)
+                {
+                    LogOnDetails.Username = _account.Username;
+                    LogOnDetails.Password = _account.Password;
+                }
             }
         }
 
         public SteamUser.LogOnDetails LogOnDetails { get; }
-        public bool IsConnected => _steamClient.IsConnected;
 
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler<SteamClient.ConnectedCallback> Connected;
@@ -189,6 +188,18 @@ namespace SteamIdler.Infrastructure
             _steamClient.Send(gamesPlayed);
         }
 
+        protected void RaisePropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected void SetValue<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            field = value;
+
+            RaisePropertyChanged(propertyName);
+        }
+
         private async Task WaitCallbacksAsync(CancellationToken cancellationToken = default)
         {
             await Task.Run(() =>
@@ -229,9 +240,8 @@ namespace SteamIdler.Infrastructure
         private void OnLoggedOnEventHandler(SteamUser.LoggedOnCallback callback)
         {
             Debug.WriteLine("[Bot.cs] LoggedOn Event Invoke");
+            RaisePropertyChanged(nameof(IsLoggedOn));
             LoggedOn?.Invoke(this, callback);
-
-            LoggedOnResult = callback.Result;
 
             if (callback.Result == EResult.OK)
             {
@@ -246,8 +256,8 @@ namespace SteamIdler.Infrastructure
         private void OnLoggedOffEventHandler(SteamUser.LoggedOffCallback callback)
         {
             Debug.WriteLine("[Bot.cs] LoggedOff Event Invoke");
+            RaisePropertyChanged(nameof(IsLoggedOn));
             LoggedOff?.Invoke(this, callback);
-            LoggedOnResult = null;
         }
 
         private async void OnUpdateMachineAuthEventHandler(SteamUser.UpdateMachineAuthCallback callback)
@@ -257,7 +267,7 @@ namespace SteamIdler.Infrastructure
             string sentryFilePath;
             bool isCreatedSentryFile = false;
 
-            if (_account != null)
+            if (_account != null && !string.IsNullOrWhiteSpace(_account.SentryFilePath))
             {
                 sentryFilePath = _account.SentryFilePath;
             }

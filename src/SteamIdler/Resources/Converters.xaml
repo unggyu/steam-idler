@@ -8,4 +8,8 @@
         <converters:NullableToBooleanConverter />
         <converters:BooleanToVisibilityConverter />
     </converters:ValueConverterGroup>
+    <converters:ValueConverterGroup x:Key="ReverseBooleanToVisibilityConverter">
+        <converters:BooleanReverseConverter />
+        <converters:BooleanToVisibilityConverter />
+    </converters:ValueConverterGroup>
 </ResourceDictionary>

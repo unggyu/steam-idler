@@ -11,10 +11,10 @@
         <Ellipse.Style>
             <Style TargetType="{x:Type Ellipse}">
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Bot.IsConnected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="True">
+                    <DataTrigger Binding="{Binding Bot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="True">
                         <Setter Property="Fill" Value="Green" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Bot.IsConnected, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="False">
+                    <DataTrigger Binding="{Binding Bot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="False">
                         <Setter Property="Fill" Value="Red" />
                     </DataTrigger>
                 </Style.Triggers>

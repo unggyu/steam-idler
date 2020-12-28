@@ -1,20 +1,13 @@
 ﻿using SteamIdler.Infrastructure.Constants;
 
-namespace SteamIdler.Infrastructure.Models
+namespace SteamIdler.Infrastructure
 {
-    public class SteamAccount : Bindable
+    public class SteamBotWithCode : Bindable
     {
-        private Account _account;
         private SteamBot _steamBot;
         private CodeType? _codeType;
         private string _code;
         private bool _isCodeRequired;
-
-        public Account Account
-        {
-            get => _account;
-            set => SetValue(ref _account, value);
-        }
 
         public SteamBot SteamBot
         {

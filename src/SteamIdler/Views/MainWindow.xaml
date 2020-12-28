@@ -8,6 +8,7 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:models="clr-namespace:SteamIdler.Infrastructure.Models;assembly=SteamIdler.Infrastructure"
+        xmlns:infra="clr-namespace:SteamIdler.Infrastructure;assembly=SteamIdler.Infrastructure"
         xmlns:helpers="clr-namespace:SteamIdler.Helpers"
         xmlns:uc="clr-namespace:SteamIdler.Views.UserControls"
         mc:Ignorable="d"
@@ -65,15 +66,15 @@
                 x:Name="AccountListBox"
                 Grid.Row="1"
                 HorizontalContentAlignment="Stretch"
-                ItemsSource="{Binding Accounts}"
-                SelectedItem="{Binding SelectedAccount}">
+                ItemsSource="{Binding Bots}"
+                SelectedItem="{Binding SelectedBot}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:SteamAccount}">
+                    <DataTemplate DataType="{x:Type infra:SteamBotWithCode}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
@@ -81,7 +82,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock
-                                Text="{Binding Account.Username, Mode=OneWay}" />
+                                Text="{Binding SteamBot.Account.Username, Mode=OneWay}" />
                             <Grid
                                 Grid.Column="1"
                                 Margin="0,0,10,0"
@@ -124,7 +125,13 @@
                     <ContextMenu>
                         <MenuItem
                             Header="{localize:Static properties:Resources.SignIn}"
+                            Visibility="{Binding PlacementTarget.SelectedItem.IsConnected, Converter={StaticResource ReverseBooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
                             Command="{Binding SignInCommand}"
+                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                        <MenuItem
+                            Header="{localize:Static properties:Resources.SignOut}"
+                            Visibility="{Binding PlacementTarget.SelectedItem.IsConnected, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
+                            Command="{Binding SignOutCommand}"
                             CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
                         <MenuItem
                             Header="{localize:Static properties:Resources.RemoveAccount}"
