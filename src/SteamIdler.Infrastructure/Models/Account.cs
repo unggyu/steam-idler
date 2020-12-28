@@ -7,6 +7,7 @@ namespace SteamIdler.Infrastructure.Models
     {
         private string _username;
         private string _password;
+        private bool _automaticLogin;
         private string _loginKey;
         private string _sentryFilePath;
         private ICollection<AccountApp> _accountApps;
@@ -21,6 +22,12 @@ namespace SteamIdler.Infrastructure.Models
         {
             get => _password;
             set => SetValue(ref _password, value);
+        }
+
+        public bool AutomaticLogin
+        {
+            get => _automaticLogin;
+            set => SetValue(ref _automaticLogin, value);
         }
 
         public string LoginKey

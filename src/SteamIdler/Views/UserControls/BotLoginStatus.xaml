@@ -6,10 +6,10 @@
              mc:Ignorable="d">
     <Ellipse
         Width="10"
-        Height="10"
-        Fill="Red">
+        Height="10">
         <Ellipse.Style>
             <Style TargetType="{x:Type Ellipse}">
+                <Setter Property="Fill" Value="Red" />
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Bot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="True">
                         <Setter Property="Fill" Value="Green" />

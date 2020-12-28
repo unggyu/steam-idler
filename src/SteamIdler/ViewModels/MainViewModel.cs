@@ -19,7 +19,6 @@ namespace SteamIdler.ViewModels
         private readonly Repository<AccountApp, int> _accountAppRepository;
         private readonly RemoteAppRepository _remoteAppRepository;
         private readonly AccountService _accountService;
-        private readonly IdlingService _idlingService;
 
         private ObservableCollection<SteamBotWithCode> _bots;
         private ObservableCollection<Infrastructure.Models.App> _apps;
@@ -34,7 +33,6 @@ namespace SteamIdler.ViewModels
             _accountAppRepository = new Repository<AccountApp, int>();
             _remoteAppRepository = RemoteAppRepository.Instance;
             _accountService = AccountService.Instance;
-            _idlingService = IdlingService.Instance;
 
             Bots = new ObservableCollection<SteamBotWithCode>();
             Apps = new ObservableCollection<Infrastructure.Models.App>();

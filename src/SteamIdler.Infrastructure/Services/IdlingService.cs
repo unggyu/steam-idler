@@ -43,11 +43,6 @@ namespace SteamIdler.Infrastructure.Services
             get => _steamBots;
         }
 
-        public bool AllBotsAreRunning
-        {
-            get => _steamBots.All(a => a.IsRunning);
-        }
-
         public bool AllBotsAreIdling
         {
             get => _steamBots.All(a => a.IsRunningApp);

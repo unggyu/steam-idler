@@ -3,7 +3,6 @@ using SteamIdler.Infrastructure.Exceptions;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Services;
 using SteamKit2;
-using SteamKit2.GC.CSGO.Internal;
 using SteamKit2.Internal;
 using System;
 using System.Collections.Generic;
@@ -56,11 +55,6 @@ namespace SteamIdler.Infrastructure
             get => _steamClient.IsConnected;
         }
 
-        public bool IsRunning
-        {
-            get => _isRunning;
-        }
-
         public bool IsLoggedOn
         {
             get => _steamUser.SteamID != null;
@@ -86,6 +80,7 @@ namespace SteamIdler.Infrastructure
                 {
                     LogOnDetails.Username = _account.Username;
                     LogOnDetails.Password = _account.Password;
+                    LogOnDetails.LoginKey = _account.LoginKey;
                 }
             }
         }
@@ -145,6 +140,11 @@ namespace SteamIdler.Infrastructure
                 }
             }
 
+            if (!_account.AutomaticLogin)
+            {
+                LogOnDetails.LoginKey = null;
+            }
+
             _steamUser.LogOn(LogOnDetails);
         }
 
@@ -152,7 +152,7 @@ namespace SteamIdler.Infrastructure
         {
             Debug.WriteLine("[Bot.cs] Logout");
 
-            _isRunning = false;
+            _steamUser.LogOff();
         }
 
         public void PlayApps(IEnumerable<App> apps = null)
@@ -204,7 +204,7 @@ namespace SteamIdler.Infrastructure
         {
             await Task.Run(() =>
             {
-                while (IsRunning)
+                while (_isRunning)
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
@@ -224,8 +224,8 @@ namespace SteamIdler.Infrastructure
         private void OnConnectedEventHandler(SteamClient.ConnectedCallback callback)
         {
             Debug.WriteLine("[Bot.cs] Connected Event Invoke");
-            Connected?.Invoke(this, callback);
             OnPropertyChanged(nameof(IsConnected));
+            Connected?.Invoke(this, callback);
         }
 
         private void OnDisconnectedEventHandler(SteamClient.DisconnectedCallback callback)
@@ -233,13 +233,13 @@ namespace SteamIdler.Infrastructure
             _isRunning = false;
 
             Debug.WriteLine("[Bot.cs] Disconnected Event Invoke");
-            Disconnected?.Invoke(this, callback);
             OnPropertyChanged(nameof(IsConnected));
+            Disconnected?.Invoke(this, callback);
         }
 
         private void OnLoggedOnEventHandler(SteamUser.LoggedOnCallback callback)
         {
-            Debug.WriteLine("[Bot.cs] LoggedOn Event Invoke");
+            Debug.WriteLine($"[Bot.cs] LoggedOn Event Invoke. Result: {callback.Result}");
             RaisePropertyChanged(nameof(IsLoggedOn));
             LoggedOn?.Invoke(this, callback);
 

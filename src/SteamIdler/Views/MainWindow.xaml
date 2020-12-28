@@ -116,7 +116,6 @@
                             </Grid>
                             <uc:BotLoginStatus
                                 Grid.Column="2"
-                                VerticalAlignment="Center"
                                 Bot="{Binding SteamBot}" />
                         </Grid>
                     </DataTemplate>
@@ -125,12 +124,12 @@
                     <ContextMenu>
                         <MenuItem
                             Header="{localize:Static properties:Resources.SignIn}"
-                            Visibility="{Binding PlacementTarget.SelectedItem.IsConnected, Converter={StaticResource ReverseBooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
+                            Visibility="{Binding PlacementTarget.SelectedItem.SteamBot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Converter={StaticResource ReverseBooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
                             Command="{Binding SignInCommand}"
                             CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
                         <MenuItem
                             Header="{localize:Static properties:Resources.SignOut}"
-                            Visibility="{Binding PlacementTarget.SelectedItem.IsConnected, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
+                            Visibility="{Binding PlacementTarget.SelectedItem.SteamBot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
                             Command="{Binding SignOutCommand}"
                             CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
                         <MenuItem
