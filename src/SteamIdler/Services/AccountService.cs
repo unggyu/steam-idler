@@ -1,6 +1,6 @@
 ﻿using SteamIdler.Infrastructure;
 using SteamIdler.Infrastructure.Models;
-using SteamIdler.Infrastructure.Services;
+using SteamIdler.Infrastructure.Repositories;
 using SteamIdler.Views;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,11 +24,11 @@ namespace SteamIdler.Services
             }
         }
 
-        private readonly Repository<Account, int> _accountRepository;
+        private readonly AccountRepository _accountRepository;
 
         public AccountService()
         {
-            _accountRepository = new Repository<Account, int>();
+            _accountRepository = new AccountRepository();
         }
 
         public async Task<SteamBot> AddAccountAsync(CancellationToken cancellationToken = default)
@@ -44,7 +44,8 @@ namespace SteamIdler.Services
             var account = new Account
             {
                 Username = bot.LogOnDetails.Username,
-                Password = bot.LogOnDetails.Password
+                Password = bot.LogOnDetails.Password,
+                AutomaticLogin = bot.LogOnDetails.ShouldRememberPassword
             };
             await _accountRepository.AddAsync(account, cancellationToken);
 

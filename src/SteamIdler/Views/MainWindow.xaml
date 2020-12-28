@@ -7,7 +7,8 @@
         xmlns:localize="http://gu.se/Localization"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
-        xmlns:models="clr-namespace:SteamIdler.Infrastructure.Models;assembly=SteamIdler.Infrastructure"
+        xmlns:localModels="clr-namespace:SteamIdler.Models"
+        xmlns:infraModels="clr-namespace:SteamIdler.Infrastructure.Models;assembly=SteamIdler.Infrastructure"
         xmlns:infra="clr-namespace:SteamIdler.Infrastructure;assembly=SteamIdler.Infrastructure"
         xmlns:helpers="clr-namespace:SteamIdler.Helpers"
         xmlns:uc="clr-namespace:SteamIdler.Views.UserControls"
@@ -51,15 +52,24 @@
                         FontSize="16"
                         VerticalAlignment="Center"
                         Text="{localize:Static properties:Resources.AccountList}" />
-                    <Button
-                        x:Name="AddAccountButton"
-                        fa:Awesome.Content="UserPlus"
+                    <StackPanel
                         Grid.Column="1"
-                        Width="50"
+                        Margin="0,0,0,5"
                         HorizontalAlignment="Right"
-                        Margin="5,0,0,5"
-                        ToolTip="{localize:Static properties:Resources.AddAccount}"
-                        Command="{Binding AddAccountCommand}" />
+                        Orientation="Horizontal">
+                        <Button
+                            x:Name="SignInAllButton"
+                            Margin="0,0,5,0"
+                            Visibility="{Binding IsAllBotsLoggedIn, Converter={StaticResource ReverseBooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
+                            Content="{localize:Static properties:Resources.SignInAll}"
+                            Command="{Binding SignInAllCommand}" />
+                        <Button
+                            x:Name="AddAccountButton"
+                            fa:Awesome.Content="UserPlus"
+                            Width="50"
+                            ToolTip="{localize:Static properties:Resources.AddAccount}"
+                            Command="{Binding AddAccountCommand}" />
+                    </StackPanel>
                 </Grid>
             </HeaderedContentControl.Header>
             <ListBox
@@ -74,11 +84,12 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type infra:SteamBotWithCode}">
+                    <DataTemplate DataType="{x:Type localModels:SteamBotForVisual}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock
@@ -114,8 +125,15 @@
                                     Command="{Binding Data.SignInCommand, Source={StaticResource MainWindowProxy}}"
                                     CommandParameter="{Binding}" />
                             </Grid>
-                            <uc:BotLoginStatus
+                            <fa:FontAwesome
                                 Grid.Column="2"
+                                Margin="0,0,5,0"
+                                Icon="ExclamationTriangle"
+                                VerticalAlignment="Center"
+                                Visibility="{Binding HasError, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
+                                ToolTip="{Binding ErrorMessage}" />
+                            <uc:BotLoginStatus
+                                Grid.Column="3"
                                 Bot="{Binding SteamBot}" />
                         </Grid>
                     </DataTemplate>
@@ -126,16 +144,62 @@
                             Header="{localize:Static properties:Resources.SignIn}"
                             Visibility="{Binding PlacementTarget.SelectedItem.SteamBot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Converter={StaticResource ReverseBooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
                             Command="{Binding SignInCommand}"
-                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}">
+                            <MenuItem.Icon>
+                                <fa:FontAwesome Icon="SignIn" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <MenuItem
                             Header="{localize:Static properties:Resources.SignOut}"
                             Visibility="{Binding PlacementTarget.SelectedItem.SteamBot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Collapsed}"
                             Command="{Binding SignOutCommand}"
-                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}">
+                            <MenuItem.Icon>
+                                <fa:FontAwesome Icon="SignOut" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                         <MenuItem
                             Header="{localize:Static properties:Resources.RemoveAccount}"
                             Command="{Binding RemoveAccountCommand}"
-                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                            CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}">
+                            <MenuItem.Icon>
+                                <fa:FontAwesome Icon="Trash" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <TextBox
+                                    ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.Username}"
+                                    Width="250"
+                                    Text="{Binding PlacementTarget.SelectedItem.SteamBot.LogOnDetails.Username, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <PasswordBox
+                                    x:Name="PasswordBox"
+                                    ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.Password}"
+                                    helpers:PasswordHelper.Attach="True"
+                                    helpers:PasswordHelper.Password="{Binding PlacementTarget.SelectedItem.SteamBot.LogOnDetails.Password, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.SelectedItem.SteamBot.Account.RememberPassword, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+                            Header="{localize:Static properties:Resources.RememberPassword}" />
+                        <MenuItem
+                            IsCheckable="True"
+                            IsChecked="{Binding PlacementTarget.SelectedItem.SteamBot.LogOnDetails.ShouldRememberPassword, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+                            Header="{localize:Static properties:Resources.AutomaticLogin}" />
+                        <MenuItem
+                            Header="{localize:Static properties:Resources.Save}"
+                            Command="{Binding SaveLogOnDetailsCommand}"
+                            CommandParameter="{Binding PlacementTarget.SelectedItem.SteamBot, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}">
+                            <MenuItem.Icon>
+                                <fa:FontAwesome Icon="Save" />
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListBox>
@@ -199,7 +263,7 @@
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type models:App}">
+                        <DataTemplate DataType="{x:Type infraModels:App}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />

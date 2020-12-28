@@ -1,7 +1,6 @@
 ﻿using SteamIdler.Infrastructure.Constants;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace SteamIdler.Views.UserControls
 {
@@ -11,8 +10,7 @@ namespace SteamIdler.Views.UserControls
     public partial class CredentialInput : UserControl
     {
         public static readonly DependencyProperty UsernameProperty = DependencyProperty.Register(nameof(Username), typeof(string), typeof(CredentialInput), new UIPropertyMetadata(string.Empty));
-        public static readonly DependencyProperty SignInCommandProperty = DependencyProperty.Register(nameof(SignInCommand), typeof(ICommand), typeof(CredentialInput), new UIPropertyMetadata(null));
-        public static readonly DependencyProperty SignInButtonIsEnabledProperty = DependencyProperty.Register(nameof(SignInButtonIsEnabled), typeof(bool), typeof(CredentialInput), new UIPropertyMetadata(true));
+        public static readonly DependencyProperty PasswordProperty = DependencyProperty.Register(nameof(Password), typeof(string), typeof(CredentialInput), new UIPropertyMetadata(string.Empty));
         public static readonly DependencyProperty CodeProperty = DependencyProperty.Register(nameof(Code), typeof(string), typeof(CredentialInput), new UIPropertyMetadata(string.Empty));
         public static readonly DependencyProperty CodeTextBoxVisibilityProperty = DependencyProperty.Register(nameof(CodeTextBoxVisibility), typeof(Visibility), typeof(CredentialInput), new UIPropertyMetadata(Visibility.Collapsed));
         public static readonly DependencyProperty CodeTypeProperty = DependencyProperty.Register(nameof(CodeType), typeof(CodeType), typeof(CredentialInput), new UIPropertyMetadata(default(CodeType)));
@@ -28,16 +26,10 @@ namespace SteamIdler.Views.UserControls
             set => SetValue(UsernameProperty, value);
         }
 
-        public ICommand SignInCommand
+        public string Password
         {
-            get => (ICommand)GetValue(SignInCommandProperty);
-            set => SetValue(SignInCommandProperty, value);
-        }
-
-        public bool SignInButtonIsEnabled
-        {
-            get => (bool)GetValue(SignInButtonIsEnabledProperty);
-            set => SetValue(SignInButtonIsEnabledProperty, value);
+            get => (string)GetValue(PasswordProperty);
+            set => SetValue(PasswordProperty, value);
         }
 
         public string Code

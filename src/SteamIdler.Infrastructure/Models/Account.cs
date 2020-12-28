@@ -7,6 +7,7 @@ namespace SteamIdler.Infrastructure.Models
     {
         private string _username;
         private string _password;
+        private bool _rememberPassword;
         private bool _automaticLogin;
         private string _loginKey;
         private string _sentryFilePath;
@@ -22,6 +23,12 @@ namespace SteamIdler.Infrastructure.Models
         {
             get => _password;
             set => SetValue(ref _password, value);
+        }
+
+        public bool RememberPassword
+        {
+            get => _rememberPassword;
+            set => SetValue(ref _rememberPassword, value);
         }
 
         public bool AutomaticLogin
@@ -55,6 +62,8 @@ namespace SteamIdler.Infrastructure.Models
                 Id = Id,
                 Username = Username,
                 Password = Password,
+                RememberPassword = RememberPassword,
+                AutomaticLogin = AutomaticLogin,
                 LoginKey = LoginKey,
                 SentryFilePath = SentryFilePath,
                 AccountApps = AccountApps.Select(a => (AccountApp)a.Clone()).ToList()

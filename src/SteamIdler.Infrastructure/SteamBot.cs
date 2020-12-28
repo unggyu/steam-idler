@@ -1,7 +1,7 @@
 ﻿using SteamIdler.Infrastructure.Constants;
 using SteamIdler.Infrastructure.Exceptions;
 using SteamIdler.Infrastructure.Models;
-using SteamIdler.Infrastructure.Services;
+using SteamIdler.Infrastructure.Repositories;
 using SteamKit2;
 using SteamKit2.Internal;
 using System;
@@ -22,7 +22,7 @@ namespace SteamIdler.Infrastructure
         private readonly SteamClient _steamClient;
         private readonly CallbackManager _callbackManager;
         private readonly SteamUser _steamUser;
-        private readonly Repository<Account, int> _accountRepository;
+        private readonly AccountRepository _accountRepository;
 
         private Account _account;
         private bool _isRunning;
@@ -38,7 +38,7 @@ namespace SteamIdler.Infrastructure
             _steamClient = new SteamClient();
             _callbackManager = new CallbackManager(_steamClient);
             _steamUser = _steamClient.GetHandler<SteamUser>();
-            _accountRepository = new Repository<Account, int>();
+            _accountRepository = new AccountRepository();
 
             LogOnDetails = new SteamUser.LogOnDetails();
 
@@ -81,6 +81,7 @@ namespace SteamIdler.Infrastructure
                     LogOnDetails.Username = _account.Username;
                     LogOnDetails.Password = _account.Password;
                     LogOnDetails.LoginKey = _account.LoginKey;
+                    LogOnDetails.ShouldRememberPassword = _account.AutomaticLogin;
                 }
             }
         }
@@ -138,11 +139,15 @@ namespace SteamIdler.Infrastructure
                     var sentryFile = File.ReadAllBytes(_account.SentryFilePath);
                     LogOnDetails.SentryFileHash = CryptoHelper.SHAHash(sentryFile);
                 }
-            }
 
-            if (!_account.AutomaticLogin)
-            {
-                LogOnDetails.LoginKey = null;
+                if (!_account.AutomaticLogin)
+                {
+                    LogOnDetails.LoginKey = null;
+                }
+                else
+                {
+                    LogOnDetails.ShouldRememberPassword = true;
+                }
             }
 
             _steamUser.LogOn(LogOnDetails);
@@ -262,6 +267,8 @@ namespace SteamIdler.Infrastructure
 
         private async void OnUpdateMachineAuthEventHandler(SteamUser.UpdateMachineAuthCallback callback)
         {
+            Debug.WriteLine($"[Bot.cs] OnUpdateMachineAuth. Data: {callback.Data}");
+
             int fileSize;
             byte[] sentryHash;
             string sentryFilePath;
@@ -318,6 +325,8 @@ namespace SteamIdler.Infrastructure
 
         private async void OnLoginKeyEventHandler(SteamUser.LoginKeyCallback callback)
         {
+            Debug.WriteLine($"[Bot.cs] OnLoginKey. LoginKey: {callback.LoginKey}");
+
             LogOnDetails.LoginKey = callback.LoginKey;
 
             var account = Account ?? await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(LogOnDetails.Username));

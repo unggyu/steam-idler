@@ -124,6 +124,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Automatic Login과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AutomaticLogin {
+            get {
+                return ResourceManager.GetString("AutomaticLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Id과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string Id {
@@ -151,6 +160,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Remember Password과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string RememberPassword {
+            get {
+                return ResourceManager.GetString("RememberPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Remove Account과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string RemoveAccount {
@@ -169,11 +187,29 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Save과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sign In과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string SignIn {
             get {
                 return ResourceManager.GetString("SignIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sign In All과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string SignInAll {
+            get {
+                return ResourceManager.GetString("SignInAll", resourceCulture);
             }
         }
         

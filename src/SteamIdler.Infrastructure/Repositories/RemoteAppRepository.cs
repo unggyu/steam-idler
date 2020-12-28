@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SteamIdler.Infrastructure.Services
+namespace SteamIdler.Infrastructure.Repositories
 {
     public class RemoteAppRepository
     {

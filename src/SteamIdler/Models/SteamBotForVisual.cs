@@ -1,13 +1,16 @@
-﻿using SteamIdler.Infrastructure.Constants;
+﻿using SteamIdler.Infrastructure;
+using SteamIdler.Infrastructure.Constants;
 
-namespace SteamIdler.Infrastructure
+namespace SteamIdler.Models
 {
-    public class SteamBotWithCode : Bindable
+    public class SteamBotForVisual : Bindable
     {
         private SteamBot _steamBot;
         private CodeType? _codeType;
         private string _code;
         private bool _isCodeRequired;
+        private bool _hasError;
+        private string _errorMessage;
 
         public SteamBot SteamBot
         {
@@ -31,6 +34,18 @@ namespace SteamIdler.Infrastructure
         {
             get => _isCodeRequired;
             set => SetValue(ref _isCodeRequired, value);
+        }
+
+        public bool HasError
+        {
+            get => _hasError;
+            set => SetValue(ref _hasError, value);
+        }
+
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set => SetValue(ref _errorMessage, value);
         }
     }
 }

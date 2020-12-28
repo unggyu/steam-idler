@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SteamIdler.Infrastructure.Services
+namespace SteamIdler.Infrastructure.Repositories
 {
     public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntity : EntityBase<TKey> where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
     {

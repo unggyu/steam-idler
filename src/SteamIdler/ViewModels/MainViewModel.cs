@@ -2,7 +2,8 @@
 using SteamIdler.Infrastructure;
 using SteamIdler.Infrastructure.Constants;
 using SteamIdler.Infrastructure.Models;
-using SteamIdler.Infrastructure.Services;
+using SteamIdler.Infrastructure.Repositories;
+using SteamIdler.Models;
 using SteamIdler.Services;
 using SteamKit2;
 using System;
@@ -14,46 +15,53 @@ namespace SteamIdler.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly Repository<Account, int> _accountRepository;
+        private readonly AccountRepository _accountRepository;
         private readonly Repository<Infrastructure.Models.App, int> _appRepository;
         private readonly Repository<AccountApp, int> _accountAppRepository;
         private readonly RemoteAppRepository _remoteAppRepository;
         private readonly AccountService _accountService;
 
-        private ObservableCollection<SteamBotWithCode> _bots;
+        private ObservableCollection<SteamBotForVisual> _bots;
         private ObservableCollection<Infrastructure.Models.App> _apps;
-        private SteamBotWithCode _selectedBot;
+        private SteamBotForVisual _selectedBot;
         private Infrastructure.Models.App _selectedApp;
         private string _appId;
 
         public MainViewModel()
         {
-            _accountRepository = new Repository<Account, int>();
+            _accountRepository = new AccountRepository();
             _appRepository = new Repository<Infrastructure.Models.App, int>();
             _accountAppRepository = new Repository<AccountApp, int>();
             _remoteAppRepository = RemoteAppRepository.Instance;
             _accountService = AccountService.Instance;
 
-            Bots = new ObservableCollection<SteamBotWithCode>();
+            Bots = new ObservableCollection<SteamBotForVisual>();
             Apps = new ObservableCollection<Infrastructure.Models.App>();
 
             AddAccountCommand = new DelegateCommand(AddAccount);
             RemoveAccountCommand = new DelegateCommand<object>(DeleteAccount);
             SignInCommand = new DelegateCommand<object>(SignIn);
+            SignInAllCommand = new DelegateCommand(SignInAll);
             SignOutCommand = new DelegateCommand<object>(SignOut);
+            SaveLogOnDetailsCommand = new DelegateCommand<object>(SaveLogOnDetails);
             AddAppCommand = new DelegateCommand(AddApp);
             RemoveAppCommand = new DelegateCommand<object>(DeleteApp);
 
             Initialize();
         }
 
-        public ObservableCollection<SteamBotWithCode> Bots
+        public ObservableCollection<SteamBotForVisual> Bots
         {
             get => _bots;
             set => SetValue(ref _bots, value);
         }
 
-        public SteamBotWithCode SelectedBot
+        public bool IsAllBotsLoggedIn
+        {
+            get => _bots.All(b => b.SteamBot.IsLoggedOn);
+        }
+
+        public SteamBotForVisual SelectedBot
         {
             get => _selectedBot;
             set
@@ -84,7 +92,9 @@ namespace SteamIdler.ViewModels
         public ICommand AddAccountCommand { get; }
         public ICommand RemoveAccountCommand { get; }
         public ICommand SignInCommand { get; }
+        public ICommand SignInAllCommand { get; }
         public ICommand SignOutCommand { get; }
+        public ICommand SaveLogOnDetailsCommand { get; }
         public ICommand AddAppCommand { get; }
         public ICommand RemoveAppCommand { get; }
 
@@ -101,15 +111,17 @@ namespace SteamIdler.ViewModels
 
             foreach (var account in accounts)
             {
-                var steamBot = new SteamBot();
-                steamBot.LogOnDetails.Username = account.Username;
-                steamBot.LogOnDetails.Password = account.Password;
-                steamBot.Account = account;
-                var steamBotWithCode = new SteamBotWithCode
+                var steamBot = new SteamBot
+                {
+                    Account = account
+                };
+                steamBot.LoggedOn += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
+                steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
+                var SteamBotForVisual = new SteamBotForVisual
                 {
                     SteamBot = steamBot
                 };
-                Bots.Add(steamBotWithCode);
+                Bots.Add(SteamBotForVisual);
             }
 
             if (accounts.Count() > 0)
@@ -131,7 +143,7 @@ namespace SteamIdler.ViewModels
 
         private async void DeleteAccount(object obj)
         {
-            if (obj == null || !(obj is SteamBotWithCode bot))
+            if (obj == null || !(obj is SteamBotForVisual bot))
             {
                 return;
             }
@@ -147,58 +159,103 @@ namespace SteamIdler.ViewModels
             }
             catch (Exception ex)
             {
+                bot.HasError = true;
+                bot.ErrorMessage = ex.Message;
             }
         }
 
         private async void SignIn(object obj)
         {
-            if (obj == null || !(obj is SteamBotWithCode bot))
+            if (obj == null || !(obj is SteamBotForVisual bot))
             {
                 return;
             }
 
-            var result = await bot.SteamBot.LoginAsync(
-                username: bot.SteamBot.Account.Username,
-                password: bot.SteamBot.Account.Password,
-                code: bot.Code,
-                codeType: bot.CodeType,
-                getPasswordByProvider: false);
-
-            switch (result.Result)
+            try
             {
-                case EResult.OK:
-                    bot.IsCodeRequired = false;
-                    bot.Code = null;
-                    bot.CodeType = null;
-                    break;
-                case EResult.AccountLogonDenied:
-                case EResult.AccountLogonDeniedVerifiedEmailRequired:
-                    await bot.SteamBot.AwaitDisconnectAsync();
-                    await bot.SteamBot.ConnectAsync();
-                    bot.IsCodeRequired = true;
-                    bot.CodeType = CodeType.Auth;
+                var result = await bot.SteamBot.LoginAsync(
+                    username: bot.SteamBot.Account.Username,
+                    password: bot.SteamBot.Account.Password,
+                    code: bot.Code,
+                    codeType: bot.CodeType,
+                    getPasswordByProvider: false);
+
+                switch (result.Result)
+                {
+                    case EResult.OK:
+                        bot.HasError = false;
+                        bot.ErrorMessage = null;
+                        bot.IsCodeRequired = false;
+                        bot.Code = null;
+                        bot.CodeType = null;
                         break;
-                case EResult.AccountLoginDeniedNeedTwoFactor:
-                    await bot.SteamBot.AwaitDisconnectAsync();
-                    await bot.SteamBot.ConnectAsync();
-                    bot.IsCodeRequired = true;
-                    bot.CodeType = CodeType.TwoFactor;
-                    break;
-                default:
-                    await bot.SteamBot.AwaitDisconnectAsync();
-                    await bot.SteamBot.ConnectAsync();
-                    break;
+                    case EResult.AccountLogonDenied:
+                    case EResult.AccountLogonDeniedVerifiedEmailRequired:
+                        await bot.SteamBot.AwaitDisconnectAsync();
+                        await bot.SteamBot.ConnectAsync();
+                        bot.IsCodeRequired = true;
+                        bot.CodeType = CodeType.Auth;
+                        break;
+                    case EResult.AccountLoginDeniedNeedTwoFactor:
+                        await bot.SteamBot.AwaitDisconnectAsync();
+                        await bot.SteamBot.ConnectAsync();
+                        bot.IsCodeRequired = true;
+                        bot.CodeType = CodeType.TwoFactor;
+                        break;
+                    default:
+                        await bot.SteamBot.AwaitDisconnectAsync();
+                        await bot.SteamBot.ConnectAsync();
+                        throw new Exception($"{result.Result}");
+                }
+            }
+            catch (Exception ex)
+            {
+                bot.HasError = true;
+                bot.ErrorMessage = ex.Message;
+            }
+        }
+
+        private void SignInAll()
+        {
+            foreach (var bot in _bots)
+            {
+                if (!bot.SteamBot.IsLoggedOn)
+                {
+                    SignIn(bot);
+                }
             }
         }
 
         private async void SignOut(object obj)
         {
-            if (obj == null || !(obj is SteamBotWithCode bot))
+            if (obj == null || !(obj is SteamBotForVisual bot))
             {
                 return;
             }
 
-            var result = await bot.SteamBot.LogoutAsync();
+            try
+            {
+                var result = await bot.SteamBot.LogoutAsync();
+            }
+            catch (Exception ex)
+            {
+                bot.HasError = true;
+                bot.ErrorMessage = ex.Message;
+            }
+        }
+
+        private async void SaveLogOnDetails(object obj)
+        {
+            if (obj == null || !(obj is SteamBot bot))
+            {
+                return;
+            }
+
+            bot.Account.Username = bot.LogOnDetails.Username;
+            bot.Account.Password = bot.LogOnDetails.Password;
+            bot.Account.AutomaticLogin = bot.LogOnDetails.ShouldRememberPassword;
+
+            await _accountRepository.EditAsync(bot.Account);
         }
 
         private async void LoadApps(int? appIdToChoose = null)

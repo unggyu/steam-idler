@@ -15,10 +15,13 @@ namespace SteamIdler.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private SteamBot _steamBot;
         private string _username;
+        private string _password;
         private string _errorText;
         private bool _isTryingToLogin;
         private CodeType? _codeType;
         private string _code;
+        private bool _rememberPassword;
+        private bool _automaticLogin;
 
         public LoginViewModel(IEventAggregator eventAggregator)
         {
@@ -33,6 +36,12 @@ namespace SteamIdler.ViewModels
         {
             get => _username;
             set => SetValue(ref _username, value);
+        }
+
+        public string Password
+        {
+            get => _password;
+            set => SetValue(ref _password, value);
         }
 
         public string ErrorText
@@ -59,6 +68,18 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _code, value);
         }
 
+        public bool RememberPassword
+        {
+            get => _rememberPassword;
+            set => SetValue(ref _rememberPassword, value);
+        }
+
+        public bool AutomaticLogin
+        {
+            get => _automaticLogin;
+            set => SetValue(ref _automaticLogin, value);
+        }
+
         public ICommand SignInCommand { get; }
 
         private void Initialize()
@@ -81,7 +102,7 @@ namespace SteamIdler.ViewModels
                 tcs.CancelAfter(10000);
                 var loginResult = await _steamBot.LoginAsync(
                     username: Username,
-                    getPasswordByProvider: true,
+                    password: Password,
                     code: Code,
                     codeType: CodeType ?? null,
                     cancellationToken: tcs.Token);
@@ -89,6 +110,10 @@ namespace SteamIdler.ViewModels
                 switch (loginResult.Result)
                 {
                     case EResult.OK:
+                        if (AutomaticLogin)
+                        {
+                            _steamBot.LogOnDetails.ShouldRememberPassword = true;
+                        }
                         _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish(_steamBot);
                         break;
                     case EResult.AccountLogonDenied:

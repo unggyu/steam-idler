@@ -1,6 +1,6 @@
 ﻿using SteamIdler.Infrastructure.Contexts;
 using SteamIdler.Infrastructure.Models;
-using SteamIdler.Infrastructure.Services;
+using SteamIdler.Infrastructure.Repositories;
 using System.Threading;
 using System.Threading.Tasks;
 
