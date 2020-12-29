@@ -1,11 +1,13 @@
 ﻿using Prism.Commands;
 using SteamIdler.Infrastructure;
 using SteamIdler.Infrastructure.Constants;
+using SteamIdler.Infrastructure.Interfaces;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Repositories;
 using SteamIdler.Models;
 using SteamIdler.Services;
 using SteamKit2;
+using SteamKit2.Internal;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,11 +17,12 @@ namespace SteamIdler.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private readonly AccountRepository _accountRepository;
-        private readonly Repository<Infrastructure.Models.App, int> _appRepository;
-        private readonly Repository<AccountApp, int> _accountAppRepository;
+        private readonly IDialogService _dialogService;
+        private readonly IRepository<Account, int> _accountRepository;
+        private readonly IRepository<Infrastructure.Models.App, int> _appRepository;
+        private readonly IAccountService _accountService;
+        private readonly IRepository<AccountApp, int> _accountAppRepository;
         private readonly RemoteAppRepository _remoteAppRepository;
-        private readonly AccountService _accountService;
 
         private ObservableCollection<SteamBotForVisual> _bots;
         private ObservableCollection<Infrastructure.Models.App> _apps;
@@ -27,13 +30,21 @@ namespace SteamIdler.ViewModels
         private Infrastructure.Models.App _selectedApp;
         private string _appId;
 
-        public MainViewModel()
+        public MainViewModel(
+            IDialogService dialogService,
+            IRepository<Account, int> accountRepository,
+            IRepository<Infrastructure.Models.App, int> appRepository,
+            IRepository<AccountApp, int> accountAppRepository,
+            IAccountService accountService)
         {
-            _accountRepository = new AccountRepository();
+            _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+            _appRepository = appRepository ?? throw new ArgumentNullException(nameof(appRepository));
+            _accountAppRepository = accountAppRepository ?? throw new ArgumentNullException(nameof(accountAppRepository));
+            _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
             _appRepository = new Repository<Infrastructure.Models.App, int>();
             _accountAppRepository = new Repository<AccountApp, int>();
             _remoteAppRepository = RemoteAppRepository.Instance;
-            _accountService = AccountService.Instance;
 
             Bots = new ObservableCollection<SteamBotForVisual>();
             Apps = new ObservableCollection<Infrastructure.Models.App>();
@@ -143,7 +154,9 @@ namespace SteamIdler.ViewModels
 
         private async void DeleteAccount(object obj)
         {
-            if (obj == null || !(obj is SteamBotForVisual bot))
+            var dialogResult = await _dialogService.ShowDeleteAccountDialogAsync();
+
+            if (obj == null || !(obj is SteamBotForVisual bot) || !dialogResult)
             {
                 return;
             }

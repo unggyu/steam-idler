@@ -1,5 +1,6 @@
 ﻿using SteamIdler.Infrastructure.Constants;
 using SteamIdler.Infrastructure.Exceptions;
+using SteamIdler.Infrastructure.Interfaces;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Repositories;
 using SteamKit2;
@@ -22,7 +23,7 @@ namespace SteamIdler.Infrastructure
         private readonly SteamClient _steamClient;
         private readonly CallbackManager _callbackManager;
         private readonly SteamUser _steamUser;
-        private readonly AccountRepository _accountRepository;
+        private readonly IRepository<Account, int> _accountRepository;
 
         private Account _account;
         private bool _isRunning;

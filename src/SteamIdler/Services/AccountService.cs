@@ -7,24 +7,14 @@ using System.Threading.Tasks;
 
 namespace SteamIdler.Services
 {
-    public class AccountService
+    public interface IAccountService
     {
-        private static AccountService _instance;
+        Task<SteamBot> AddAccountAsync(CancellationToken cancellationToken = default);
+    }
 
-        public static AccountService Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new AccountService();
-                }
-
-                return _instance;
-            }
-        }
-
-        private readonly AccountRepository _accountRepository;
+    public class AccountService : IAccountService
+    {
+        private readonly IRepository<Account, int> _accountRepository;
 
         public AccountService()
         {

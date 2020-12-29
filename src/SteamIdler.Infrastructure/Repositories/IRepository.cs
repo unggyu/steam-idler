@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SteamIdler.Infrastructure.Interfaces
+namespace SteamIdler.Infrastructure.Repositories
 {
     public interface IRepository<TEntity, TKey> : IReadonlyRepository<TEntity, TKey> where TEntity : EntityBase<TKey> where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
     {

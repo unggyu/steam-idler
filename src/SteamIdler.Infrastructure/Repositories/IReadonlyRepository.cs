@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SteamIdler.Infrastructure.Interfaces
+namespace SteamIdler.Infrastructure.Repositories
 {
     public interface IReadonlyRepository<TEntity, TKey> where TEntity : EntityBase<TKey> where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
     {

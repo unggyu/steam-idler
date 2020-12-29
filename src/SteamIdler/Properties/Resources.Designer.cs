@@ -61,6 +61,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Are you sure you want to delete your account?과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string AccountDeletionConfirmationPhrase {
+            get {
+                return ResourceManager.GetString("AccountDeletionConfirmationPhrase", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Account List과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string AccountList {
@@ -129,6 +138,24 @@ namespace SteamIdler.Properties {
         internal static string AutomaticLogin {
             get {
                 return ResourceManager.GetString("AutomaticLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cancel과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Cancel {
+            get {
+                return ResourceManager.GetString("Cancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Delete과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
             }
         }
         

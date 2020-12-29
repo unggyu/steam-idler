@@ -10,7 +10,13 @@ using System.Threading.Tasks;
 
 namespace SteamIdler.Infrastructure.Repositories
 {
-    public class RemoteAppRepository
+    public interface IRemoteAppRepository
+    {
+        IAsyncEnumerable<App> GetAllAppsAsync(CancellationToken cancellationToken = default);
+        Task<App> GetAppAsync(int appId, CancellationToken cancellationToken = default);
+    }
+
+    public class RemoteAppRepository : IRemoteAppRepository
     {
         private static RemoteAppRepository _instance;
 

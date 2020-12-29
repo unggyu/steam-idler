@@ -1,6 +1,9 @@
 ﻿using CommonServiceLocator;
 using Microsoft.Extensions.DependencyInjection;
 using Prism.Events;
+using SteamIdler.Infrastructure.Models;
+using SteamIdler.Infrastructure.Repositories;
+using SteamIdler.Services;
 using SteamIdler.ViewModels;
 using SteamIdler.Views;
 using System;
@@ -26,7 +29,13 @@ namespace SteamIdler
                 .AddScoped<MainViewModel>();
 
             services
-                .AddScoped<IEventAggregator, EventAggregator>();
+                .AddScoped<IDialogService, DialogService>()
+                .AddScoped<IEventAggregator, EventAggregator>()
+                .AddScoped<IAccountService, AccountService>()
+                .AddScoped<IRepository<Account, int>, AccountRepository>()
+                .AddScoped<IRepository<Infrastructure.Models.App, int>, Repository<Infrastructure.Models.App, int>>()
+                .AddScoped<IRepository<AccountApp, int>, Repository<AccountApp, int>>()
+                .AddScoped<IRemoteAppRepository, RemoteAppRepository>();
 
             return services.BuildServiceProvider();
         }
