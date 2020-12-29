@@ -9,11 +9,24 @@ namespace SteamIdler.Services
 {
     public interface IDialogService
     {
+        void ShowErrorMessage(string title, string content);
         Task<bool> ShowDeleteAccountDialogAsync();
     }
 
     public class DialogService : IDialogService
     {
+        public void ShowErrorMessage(string title, string content)
+        {
+            var dialog = new ContentDialog
+            {
+                Title = title,
+                Content = content,
+                PrimaryButtonText = Resources.Confirm
+            };
+
+            dialog.ShowAsync();
+        }
+
         public async Task<bool> ShowDeleteAccountDialogAsync()
         {
             var primaryButtonStyle = new Style

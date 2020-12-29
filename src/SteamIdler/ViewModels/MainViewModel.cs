@@ -1,15 +1,15 @@
 ﻿using Prism.Commands;
 using SteamIdler.Infrastructure;
 using SteamIdler.Infrastructure.Constants;
-using SteamIdler.Infrastructure.Interfaces;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Repositories;
 using SteamIdler.Models;
+using SteamIdler.Properties;
 using SteamIdler.Services;
 using SteamKit2;
-using SteamKit2.Internal;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Input;
 
@@ -22,7 +22,7 @@ namespace SteamIdler.ViewModels
         private readonly IRepository<Infrastructure.Models.App, int> _appRepository;
         private readonly IAccountService _accountService;
         private readonly IRepository<AccountApp, int> _accountAppRepository;
-        private readonly RemoteAppRepository _remoteAppRepository;
+        private readonly IRemoteAppRepository _remoteAppRepository;
 
         private ObservableCollection<SteamBotForVisual> _bots;
         private ObservableCollection<Infrastructure.Models.App> _apps;
@@ -35,16 +35,15 @@ namespace SteamIdler.ViewModels
             IRepository<Account, int> accountRepository,
             IRepository<Infrastructure.Models.App, int> appRepository,
             IRepository<AccountApp, int> accountAppRepository,
+            IRemoteAppRepository remoteAppRepository,
             IAccountService accountService)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
             _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
             _appRepository = appRepository ?? throw new ArgumentNullException(nameof(appRepository));
             _accountAppRepository = accountAppRepository ?? throw new ArgumentNullException(nameof(accountAppRepository));
+            _remoteAppRepository = remoteAppRepository ?? throw new ArgumentNullException(nameof(remoteAppRepository));
             _accountService = accountService ?? throw new ArgumentNullException(nameof(accountService));
-            _appRepository = new Repository<Infrastructure.Models.App, int>();
-            _accountAppRepository = new Repository<AccountApp, int>();
-            _remoteAppRepository = RemoteAppRepository.Instance;
 
             Bots = new ObservableCollection<SteamBotForVisual>();
             Apps = new ObservableCollection<Infrastructure.Models.App>();
@@ -116,28 +115,36 @@ namespace SteamIdler.ViewModels
 
         private async void LoadBots()
         {
-            Bots.Clear();
-
-            var accounts = await _accountRepository.GetAllItemsAsync();
-
-            foreach (var account in accounts)
+            try
             {
-                var steamBot = new SteamBot
+                Bots.Clear();
+
+                var accounts = await _accountRepository.GetAllItemsAsync();
+
+                foreach (var account in accounts)
                 {
-                    Account = account
-                };
-                steamBot.LoggedOn += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
-                steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
-                var SteamBotForVisual = new SteamBotForVisual
+                    var steamBot = new SteamBot
+                    {
+                        Account = account
+                    };
+                    steamBot.LoggedOn += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
+                    steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
+                    var SteamBotForVisual = new SteamBotForVisual
+                    {
+                        SteamBot = steamBot
+                    };
+                    Bots.Add(SteamBotForVisual);
+                }
+
+                if (accounts.Count() > 0)
                 {
-                    SteamBot = steamBot
-                };
-                Bots.Add(SteamBotForVisual);
+                    SelectedBot = Bots.FirstOrDefault();
+                }
             }
-
-            if (accounts.Count() > 0)
+            catch (Exception ex)
             {
-                SelectedBot = Bots.FirstOrDefault();
+                Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_LoadAccounts);
             }
         }
 
@@ -273,47 +280,55 @@ namespace SteamIdler.ViewModels
 
         private async void LoadApps(int? appIdToChoose = null)
         {
-            if (SelectedBot == null)
+            try
             {
-                return;
-            }
-
-            Apps.Clear();
-
-            var accountApps = await _accountAppRepository.GetItemsAsync(aa => aa.AccountId == SelectedBot.SteamBot.Account.Id);
-            if (accountApps == null)
-            {
-                return;
-            }
-
-            var apps = accountApps.Select(aa => aa.App);
-            foreach (var app in apps)
-            {
-                if (app != null)
+                if (SelectedBot == null)
                 {
-                    Apps.Add(app);
+                    return;
+                }
+
+                Apps.Clear();
+
+                var accountApps = await _accountAppRepository.GetItemsAsync(aa => aa.AccountId == SelectedBot.SteamBot.Account.Id);
+                if (accountApps == null)
+                {
+                    return;
+                }
+
+                var apps = accountApps.Select(aa => aa.App);
+                foreach (var app in apps)
+                {
+                    if (app != null)
+                    {
+                        Apps.Add(app);
+                    }
+                }
+
+                if (appIdToChoose.HasValue)
+                {
+                    SelectedApp = Apps.FirstOrDefault(a => a.Id == appIdToChoose.Value);
+                }
+                else if (Apps.Count() > 0)
+                {
+                    SelectedApp = Apps.FirstOrDefault();
                 }
             }
-
-            if (appIdToChoose.HasValue)
+            catch (Exception ex)
             {
-                SelectedApp = Apps.FirstOrDefault(a => a.Id == appIdToChoose.Value);
-            }
-            else if (Apps.Count() > 0)
-            {
-                SelectedApp = Apps.FirstOrDefault();
+                Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_LoadApps);
             }
         }
 
         private async void AddApp()
         {
-            if (SelectedBot == null || string.IsNullOrWhiteSpace(AppId))
-            {
-                return;
-            }
-
             try
             {
+                if (SelectedBot == null || string.IsNullOrWhiteSpace(AppId))
+                {
+                    return;
+                }
+
                 var appId = int.Parse(AppId);
                 var app = await _remoteAppRepository.GetAppAsync(appId);
                 if (app == null)
@@ -342,6 +357,8 @@ namespace SteamIdler.ViewModels
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_AddApp);
             }
         }
 
@@ -368,6 +385,8 @@ namespace SteamIdler.ViewModels
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_DeleteApp);
             }
         }
     }

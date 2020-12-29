@@ -1,6 +1,5 @@
 ﻿using SteamIdler.Infrastructure.Constants;
 using SteamIdler.Infrastructure.Exceptions;
-using SteamIdler.Infrastructure.Interfaces;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Repositories;
 using SteamKit2;
@@ -13,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -268,7 +268,7 @@ namespace SteamIdler.Infrastructure
 
         private async void OnUpdateMachineAuthEventHandler(SteamUser.UpdateMachineAuthCallback callback)
         {
-            Debug.WriteLine($"[Bot.cs] OnUpdateMachineAuth. Data: {callback.Data}");
+            Debug.WriteLine($"[Bot.cs] OnUpdateMachineAuth. Data: {Encoding.Default.GetString(callback.Data)}");
 
             int fileSize;
             byte[] sentryHash;

@@ -151,11 +151,65 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Confirm과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Confirm {
+            get {
+                return ResourceManager.GetString("Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Delete과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string Delete {
             get {
                 return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Error과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   An error occurred while adding the app과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Error_AddApp {
+            get {
+                return ResourceManager.GetString("Error_AddApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   An error occurred while deleting the app과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Error_DeleteApp {
+            get {
+                return ResourceManager.GetString("Error_DeleteApp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   An error occurred while loading accounts과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Error_LoadAccounts {
+            get {
+                return ResourceManager.GetString("Error_LoadAccounts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   An error occurred while loading the app과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Error_LoadApps {
+            get {
+                return ResourceManager.GetString("Error_LoadApps", resourceCulture);
             }
         }
         

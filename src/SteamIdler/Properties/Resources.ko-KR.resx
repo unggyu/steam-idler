@@ -147,8 +147,26 @@
   <data name="Cancel" xml:space="preserve">
     <value>취소</value>
   </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>확인</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>삭제</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>에러</value>
+  </data>
+  <data name="Error_AddApp" xml:space="preserve">
+    <value>앱을 추가하는 도중 에러가 발생하셨습니다</value>
+  </data>
+  <data name="Error_DeleteApp" xml:space="preserve">
+    <value>앱을 삭제하는 도중 에러가 발생하였습니다</value>
+  </data>
+  <data name="Error_LoadAccounts" xml:space="preserve">
+    <value>계정들을 로드하는 도중 에러가 발생하였습니다</value>
+  </data>
+  <data name="Error_LoadApps" xml:space="preserve">
+    <value>앱들을 로드하는 도중 에러가 발생하였습니다</value>
   </data>
   <data name="Id" xml:space="preserve">
     <value>아이디</value>

@@ -147,8 +147,26 @@
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="Error_AddApp" xml:space="preserve">
+    <value>An error occurred while adding the app</value>
+  </data>
+  <data name="Error_DeleteApp" xml:space="preserve">
+    <value>An error occurred while deleting the app</value>
+  </data>
+  <data name="Error_LoadAccounts" xml:space="preserve">
+    <value>An error occurred while loading accounts</value>
+  </data>
+  <data name="Error_LoadApps" xml:space="preserve">
+    <value>An error occurred while loading the app</value>
   </data>
   <data name="Id" xml:space="preserve">
     <value>Id</value>
