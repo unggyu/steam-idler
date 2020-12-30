@@ -223,6 +223,15 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Login key is incorrect과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Description_InvalidLoginKey {
+            get {
+                return ResourceManager.GetString("Description_InvalidLoginKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Password is not valid과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string Description_InvalidPassword {

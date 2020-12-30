@@ -26,6 +26,7 @@ namespace SteamIdler.Infrastructure
         private readonly IRepository<Account, int> _accountRepository;
 
         private Account _account;
+        private bool _isLoggingIn;
         private bool _isRunning;
         private CancellationTokenSource _tokenSource;
 
@@ -54,6 +55,12 @@ namespace SteamIdler.Infrastructure
         public bool IsConnected
         {
             get => _steamClient.IsConnected;
+        }
+
+        public bool IsLoggingIn
+        {
+            get => _isLoggingIn;
+            private set => SetValue(ref _isLoggingIn, value);
         }
 
         public bool IsLoggedOn
@@ -151,6 +158,7 @@ namespace SteamIdler.Infrastructure
                 }
             }
 
+            IsLoggingIn = true;
             _steamUser.LogOn(LogOnDetails);
         }
 
@@ -237,6 +245,7 @@ namespace SteamIdler.Infrastructure
         private void OnDisconnectedEventHandler(SteamClient.DisconnectedCallback callback)
         {
             _isRunning = false;
+            IsLoggingIn = false;
 
             Debug.WriteLine("[Bot.cs] Disconnected Event Invoke");
             OnPropertyChanged(nameof(IsConnected));
@@ -247,6 +256,7 @@ namespace SteamIdler.Infrastructure
         private void OnLoggedOnEventHandler(SteamUser.LoggedOnCallback callback)
         {
             Debug.WriteLine($"[Bot.cs] LoggedOn Event Invoke. Result: {callback.Result}");
+            IsLoggingIn = false;
             RaisePropertyChanged(nameof(IsLoggedOn));
             LoggedOn?.Invoke(this, callback);
 
@@ -263,6 +273,7 @@ namespace SteamIdler.Infrastructure
         private void OnLoggedOffEventHandler(SteamUser.LoggedOffCallback callback)
         {
             Debug.WriteLine("[Bot.cs] LoggedOff Event Invoke");
+            IsLoggingIn = false;
             RaisePropertyChanged(nameof(IsLoggedOn));
             LoggedOff?.Invoke(this, callback);
         }

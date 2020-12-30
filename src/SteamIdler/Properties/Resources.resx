@@ -171,6 +171,9 @@
   <data name="Description_InvalidLoginAuthCode" xml:space="preserve">
     <value>Auth code is not correct</value>
   </data>
+  <data name="Description_InvalidLoginKey" xml:space="preserve">
+    <value>Login key is incorrect</value>
+  </data>
   <data name="Description_InvalidPassword" xml:space="preserve">
     <value>Password is not valid</value>
   </data>

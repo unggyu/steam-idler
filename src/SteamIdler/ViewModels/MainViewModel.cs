@@ -154,7 +154,6 @@ namespace SteamIdler.ViewModels
                 Bots.Clear();
 
                 var accounts = await _accountRepository.GetAllItemsAsync();
-
                 foreach (var account in accounts)
                 {
                     var steamBot = new SteamBot
@@ -164,11 +163,16 @@ namespace SteamIdler.ViewModels
                     steamBot.LoggedOn += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
                     steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
                     steamBot.Disconnected += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
-                    var SteamBotForVisual = new SteamBotForVisual
+                    var steamBotForVisual = new SteamBotForVisual
                     {
                         SteamBot = steamBot
                     };
-                    Bots.Add(SteamBotForVisual);
+                    Bots.Add(steamBotForVisual);
+
+                    if (account.AutomaticLogin)
+                    {
+                        SignIn(steamBotForVisual);
+                    }
                 }
 
                 if (accounts.Count() > 0)
@@ -242,6 +246,15 @@ namespace SteamIdler.ViewModels
                         bot.ErrorMessage = null;
                         bot.Code = null;
                         bot.CodeType = null;
+                        break;
+                    case EResult.InvalidPassword:
+                        if (!string.IsNullOrWhiteSpace(bot.SteamBot.LogOnDetails.LoginKey) && bot.SteamBot.LogOnDetails.ShouldRememberPassword)
+                        {
+                            bot.SteamBot.LogOnDetails.LoginKey = string.Empty;
+                            bot.SteamBot.Account.LoginKey = string.Empty;
+
+                            throw new Exception(Resources.Description_InvalidLoginKey);
+                        }
                         break;
                     default:
                         await bot.SteamBot.AwaitDisconnectAsync();

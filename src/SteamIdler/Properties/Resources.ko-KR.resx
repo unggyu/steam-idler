@@ -171,6 +171,9 @@
   <data name="Description_InvalidLoginAuthCode" xml:space="preserve">
     <value>인증 코드가 올바르지 않습니다</value>
   </data>
+  <data name="Description_InvalidLoginKey" xml:space="preserve">
+    <value>로그인 키가 올바르지 않습니다</value>
+  </data>
   <data name="Description_InvalidPassword" xml:space="preserve">
     <value>비밀번호가 올바르지 않습니다</value>
   </data>
