@@ -169,47 +169,101 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
-        ///   Error과(와) 유사한 지역화된 문자열을 찾습니다.
+        ///   Account Logon denied. Need two-factor code과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Error {
+        internal static string Description_AccountLoginDeniedNeedTwoFactor {
             get {
-                return ResourceManager.GetString("Error", resourceCulture);
+                return ResourceManager.GetString("Description_AccountLoginDeniedNeedTwoFactor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Account logon denied과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Description_AccountLogonDenied {
+            get {
+                return ResourceManager.GetString("Description_AccountLogonDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Account logon denied. Verified email required과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Description_AccountLogonDeniedVerifiedEmailRequired {
+            get {
+                return ResourceManager.GetString("Description_AccountLogonDeniedVerifiedEmailRequired", resourceCulture);
             }
         }
         
         /// <summary>
         ///   An error occurred while adding the app과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Error_AddApp {
+        internal static string Description_AddAppError {
             get {
-                return ResourceManager.GetString("Error_AddApp", resourceCulture);
+                return ResourceManager.GetString("Description_AddAppError", resourceCulture);
             }
         }
         
         /// <summary>
         ///   An error occurred while deleting the app과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Error_DeleteApp {
+        internal static string Description_DeleteAppError {
             get {
-                return ResourceManager.GetString("Error_DeleteApp", resourceCulture);
+                return ResourceManager.GetString("Description_DeleteAppError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Auth code is not correct과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Description_InvalidLoginAuthCode {
+            get {
+                return ResourceManager.GetString("Description_InvalidLoginAuthCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Password is not valid과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Description_InvalidPassword {
+            get {
+                return ResourceManager.GetString("Description_InvalidPassword", resourceCulture);
             }
         }
         
         /// <summary>
         ///   An error occurred while loading accounts과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Error_LoadAccounts {
+        internal static string Description_LoadAccountsError {
             get {
-                return ResourceManager.GetString("Error_LoadAccounts", resourceCulture);
+                return ResourceManager.GetString("Description_LoadAccountsError", resourceCulture);
             }
         }
         
         /// <summary>
         ///   An error occurred while loading the app과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
-        internal static string Error_LoadApps {
+        internal static string Description_LoadAppsError {
             get {
-                return ResourceManager.GetString("Error_LoadApps", resourceCulture);
+                return ResourceManager.GetString("Description_LoadAppsError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Two-factor code is not correct과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Description_TwoFactorCodeMismatch {
+            get {
+                return ResourceManager.GetString("Description_TwoFactorCodeMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Error과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
             }
         }
         

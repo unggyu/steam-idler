@@ -21,7 +21,11 @@ namespace SteamIdler.Models
         public CodeType? CodeType
         {
             get => _codeType;
-            set => SetValue(ref _codeType, value);
+            set
+            {
+                SetValue(ref _codeType, value);
+                IsCodeRequired = value != null;
+            }
         }
 
         public string Code

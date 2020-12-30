@@ -9,7 +9,6 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         xmlns:localModels="clr-namespace:SteamIdler.Models"
         xmlns:infraModels="clr-namespace:SteamIdler.Infrastructure.Models;assembly=SteamIdler.Infrastructure"
-        xmlns:infra="clr-namespace:SteamIdler.Infrastructure;assembly=SteamIdler.Infrastructure"
         xmlns:helpers="clr-namespace:SteamIdler.Helpers"
         xmlns:uc="clr-namespace:SteamIdler.Views.UserControls"
         mc:Ignorable="d"

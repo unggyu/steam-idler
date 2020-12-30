@@ -32,6 +32,7 @@ namespace SteamIdler
                 .AddScoped<IDialogService, DialogService>()
                 .AddScoped<IEventAggregator, EventAggregator>()
                 .AddScoped<IAccountService, AccountService>()
+                .AddScoped<ISteamErrorMessageService, SteamErrorMessageService>()
                 .AddScoped<IRepository<Account, int>, AccountRepository>()
                 .AddScoped<IRepository<Infrastructure.Models.App, int>, Repository<Infrastructure.Models.App, int>>()
                 .AddScoped<IRepository<AccountApp, int>, Repository<AccountApp, int>>()

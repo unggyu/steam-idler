@@ -121,7 +121,7 @@ namespace SteamIdler.Infrastructure
             return result;
         }
 
-        public static async Task<SteamUser.LoggedOffCallback> LogoutAsync(this SteamBot steamBot, CancellationToken cancellationToken = default)
+        public static async Task<SteamClient.DisconnectedCallback> LogoutAsync(this SteamBot steamBot, CancellationToken cancellationToken = default)
         {
             if (steamBot == null)
             {
@@ -129,10 +129,10 @@ namespace SteamIdler.Infrastructure
             }
 
             var result = await TaskExt
-                .FromEvent<SteamUser.LoggedOffCallback>()
-                .Start(handler => steamBot.LoggedOff += handler,
+                .FromEvent<SteamClient.DisconnectedCallback>()
+                .Start(handler => steamBot.Disconnected += handler,
                        () => steamBot.Logout(),
-                       handler => steamBot.LoggedOff -= handler,
+                       handler => steamBot.Disconnected -= handler,
                        cancellationToken);
 
             return result;

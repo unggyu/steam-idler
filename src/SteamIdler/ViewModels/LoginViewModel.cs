@@ -23,11 +23,11 @@ namespace SteamIdler.ViewModels
         private bool _rememberPassword;
         private bool _automaticLogin;
 
+        private ICommand _signInCommand;
+
         public LoginViewModel(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
-
-            SignInCommand = new DelegateCommand(SignIn);
 
             Initialize();
         }
@@ -80,7 +80,10 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _automaticLogin, value);
         }
 
-        public ICommand SignInCommand { get; }
+        public ICommand SignInCommand
+        {
+            get => _signInCommand ??= new DelegateCommand(SignIn);
+        }
 
         private void Initialize()
         {

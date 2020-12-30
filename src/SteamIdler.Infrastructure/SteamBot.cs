@@ -240,6 +240,7 @@ namespace SteamIdler.Infrastructure
 
             Debug.WriteLine("[Bot.cs] Disconnected Event Invoke");
             OnPropertyChanged(nameof(IsConnected));
+            OnPropertyChanged(nameof(IsLoggedOn));
             Disconnected?.Invoke(this, callback);
         }
 

@@ -18,6 +18,7 @@ namespace SteamIdler.ViewModels
     public class MainViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
+        private readonly ISteamErrorMessageService _steamErrorMessageService;
         private readonly IRepository<Account, int> _accountRepository;
         private readonly IRepository<Infrastructure.Models.App, int> _appRepository;
         private readonly IAccountService _accountService;
@@ -30,8 +31,18 @@ namespace SteamIdler.ViewModels
         private Infrastructure.Models.App _selectedApp;
         private string _appId;
 
+        private ICommand _addAccountCommand;
+        private ICommand _removeAccountCommand;
+        private ICommand _signInCommand;
+        private ICommand _signInAllCommand;
+        private ICommand _signOutCommand;
+        private ICommand _saveLogOnDetailsCommand;
+        private ICommand _addAppCommand;
+        private ICommand _removeAppCommand;
+
         public MainViewModel(
             IDialogService dialogService,
+            ISteamErrorMessageService steamErrorMessageService,
             IRepository<Account, int> accountRepository,
             IRepository<Infrastructure.Models.App, int> appRepository,
             IRepository<AccountApp, int> accountAppRepository,
@@ -39,6 +50,7 @@ namespace SteamIdler.ViewModels
             IAccountService accountService)
         {
             _dialogService = dialogService ?? throw new ArgumentNullException(nameof(dialogService));
+            _steamErrorMessageService = steamErrorMessageService ?? throw new ArgumentNullException(nameof(steamErrorMessageService));
             _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
             _appRepository = appRepository ?? throw new ArgumentNullException(nameof(appRepository));
             _accountAppRepository = accountAppRepository ?? throw new ArgumentNullException(nameof(accountAppRepository));
@@ -47,15 +59,6 @@ namespace SteamIdler.ViewModels
 
             Bots = new ObservableCollection<SteamBotForVisual>();
             Apps = new ObservableCollection<Infrastructure.Models.App>();
-
-            AddAccountCommand = new DelegateCommand(AddAccount);
-            RemoveAccountCommand = new DelegateCommand<object>(DeleteAccount);
-            SignInCommand = new DelegateCommand<object>(SignIn);
-            SignInAllCommand = new DelegateCommand(SignInAll);
-            SignOutCommand = new DelegateCommand<object>(SignOut);
-            SaveLogOnDetailsCommand = new DelegateCommand<object>(SaveLogOnDetails);
-            AddAppCommand = new DelegateCommand(AddApp);
-            RemoveAppCommand = new DelegateCommand<object>(DeleteApp);
 
             Initialize();
         }
@@ -99,14 +102,45 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _appId, value);
         }
 
-        public ICommand AddAccountCommand { get; }
-        public ICommand RemoveAccountCommand { get; }
-        public ICommand SignInCommand { get; }
-        public ICommand SignInAllCommand { get; }
-        public ICommand SignOutCommand { get; }
-        public ICommand SaveLogOnDetailsCommand { get; }
-        public ICommand AddAppCommand { get; }
-        public ICommand RemoveAppCommand { get; }
+        public ICommand AddAccountCommand
+        {
+            get => _addAccountCommand ??= new DelegateCommand(AddAccount);
+        }
+
+        public ICommand RemoveAccountCommand
+        {
+            get => _removeAccountCommand ??= new DelegateCommand<object>(RemoveAccount);
+        }
+
+        public ICommand SignInCommand
+        {
+            get => _signInCommand ??= new DelegateCommand<object>(SignIn);
+        }
+
+        public ICommand SignInAllCommand
+        {
+            get => _signInAllCommand ??= new DelegateCommand(SignInAll);
+        }
+
+        public ICommand SignOutCommand
+        {
+            get => _signOutCommand ??= new DelegateCommand<object>(SignOut);
+        }
+
+        public ICommand SaveLogOnDetailsCommand
+        {
+            get => _saveLogOnDetailsCommand ??= new DelegateCommand<object>(SaveLogOnDetails);
+        }
+
+        public ICommand AddAppCommand
+        {
+            get => _addAppCommand ??= new DelegateCommand(AddApp);
+        }
+
+        public ICommand RemoveAppCommand
+        {
+            get => _removeAppCommand ??= new DelegateCommand<object>(RemoveApp);
+        }
 
         private void Initialize()
         {
@@ -129,7 +163,7 @@ namespace SteamIdler.ViewModels
                     };
                     steamBot.LoggedOn += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
                     steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
-                    steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
+                    steamBot.Disconnected += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
                     var SteamBotForVisual = new SteamBotForVisual
                     {
                         SteamBot = steamBot
@@ -145,7 +179,7 @@ namespace SteamIdler.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
-                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_LoadAccounts);
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Description_LoadAccountsError);
             }
         }
 
@@ -160,7 +194,7 @@ namespace SteamIdler.ViewModels
             LoadBots();
         }
 
-        private async void DeleteAccount(object obj)
+        private async void RemoveAccount(object obj)
         {
             var dialogResult = await _dialogService.ShowDeleteAccountDialogAsync();
 
@@ -206,27 +240,26 @@ namespace SteamIdler.ViewModels
                     case EResult.OK:
                         bot.HasError = false;
                         bot.ErrorMessage = null;
-                        bot.IsCodeRequired = false;
                         bot.Code = null;
                         bot.CodeType = null;
-                        break;
-                    case EResult.AccountLogonDenied:
-                    case EResult.AccountLogonDeniedVerifiedEmailRequired:
-                        await bot.SteamBot.AwaitDisconnectAsync();
-                        await bot.SteamBot.ConnectAsync();
-                        bot.IsCodeRequired = true;
-                        bot.CodeType = CodeType.Auth;
-                        break;
-                    case EResult.AccountLoginDeniedNeedTwoFactor:
-                        await bot.SteamBot.AwaitDisconnectAsync();
-                        await bot.SteamBot.ConnectAsync();
-                        bot.IsCodeRequired = true;
-                        bot.CodeType = CodeType.TwoFactor;
                         break;
                     default:
                         await bot.SteamBot.AwaitDisconnectAsync();
                         await bot.SteamBot.ConnectAsync();
-                        throw new Exception($"{result.Result}");
+                        switch (result.Result)
+                        {
+                            case EResult.AccountLogonDenied:
+                            case EResult.AccountLogonDeniedVerifiedEmailRequired:
+                            case EResult.InvalidLoginAuthCode:
+                                bot.CodeType = CodeType.Auth;
+                                break;
+                            case EResult.AccountLoginDeniedNeedTwoFactor:
+                            case EResult.TwoFactorCodeMismatch:
+                                bot.CodeType = CodeType.TwoFactor;
+                                break;
+                        }
+                        var errorMsg = await _steamErrorMessageService.GetErrorMessageAsync(result.Result);
+                        throw new Exception(errorMsg);
                 }
             }
             catch (Exception ex)
@@ -317,7 +350,7 @@ namespace SteamIdler.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
-                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_LoadApps);
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Description_LoadAppsError);
             }
         }
 
@@ -359,11 +392,11 @@ namespace SteamIdler.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
-                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_AddApp);
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Description_AddAppError);
             }
         }
 
-        private async void DeleteApp(object app)
+        private async void RemoveApp(object app)
         {
             if (app == null || !(app is Infrastructure.Models.App castedApp))
             {
@@ -387,7 +420,7 @@ namespace SteamIdler.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"[MainViewModel.cs] {ex.Message}");
-                _dialogService.ShowErrorMessage(Resources.Error, Resources.Error_DeleteApp);
+                _dialogService.ShowErrorMessage(Resources.Error, Resources.Description_DeleteAppError);
             }
         }
     }

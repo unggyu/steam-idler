@@ -153,20 +153,38 @@
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="Error" xml:space="preserve">
-    <value>Error</value>
+  <data name="Description_AccountLoginDeniedNeedTwoFactor" xml:space="preserve">
+    <value>Account Logon denied. Need two-factor code</value>
   </data>
-  <data name="Error_AddApp" xml:space="preserve">
+  <data name="Description_AccountLogonDenied" xml:space="preserve">
+    <value>Account logon denied</value>
+  </data>
+  <data name="Description_AccountLogonDeniedVerifiedEmailRequired" xml:space="preserve">
+    <value>Account logon denied. Verified email required</value>
+  </data>
+  <data name="Description_AddAppError" xml:space="preserve">
     <value>An error occurred while adding the app</value>
   </data>
-  <data name="Error_DeleteApp" xml:space="preserve">
+  <data name="Description_DeleteAppError" xml:space="preserve">
     <value>An error occurred while deleting the app</value>
   </data>
-  <data name="Error_LoadAccounts" xml:space="preserve">
+  <data name="Description_InvalidLoginAuthCode" xml:space="preserve">
+    <value>Auth code is not correct</value>
+  </data>
+  <data name="Description_InvalidPassword" xml:space="preserve">
+    <value>Password is not valid</value>
+  </data>
+  <data name="Description_LoadAccountsError" xml:space="preserve">
     <value>An error occurred while loading accounts</value>
   </data>
-  <data name="Error_LoadApps" xml:space="preserve">
+  <data name="Description_LoadAppsError" xml:space="preserve">
     <value>An error occurred while loading the app</value>
+  </data>
+  <data name="Description_TwoFactorCodeMismatch" xml:space="preserve">
+    <value>Two-factor code is not correct</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
   </data>
   <data name="Id" xml:space="preserve">
     <value>Id</value>

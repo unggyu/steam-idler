@@ -153,20 +153,38 @@
   <data name="Delete" xml:space="preserve">
     <value>삭제</value>
   </data>
-  <data name="Error" xml:space="preserve">
-    <value>에러</value>
+  <data name="Description_AccountLoginDeniedNeedTwoFactor" xml:space="preserve">
+    <value>계정 로그인이 거부되었습니다. 2단계 인증 코드가 필요합니다</value>
   </data>
-  <data name="Error_AddApp" xml:space="preserve">
+  <data name="Description_AccountLogonDenied" xml:space="preserve">
+    <value>계정 로그인이 거부되었습니다</value>
+  </data>
+  <data name="Description_AccountLogonDeniedVerifiedEmailRequired" xml:space="preserve">
+    <value>계정 로그인이 거부되었습니다. 이메일 인증이 필요합니다</value>
+  </data>
+  <data name="Description_AddAppError" xml:space="preserve">
     <value>앱을 추가하는 도중 에러가 발생하셨습니다</value>
   </data>
-  <data name="Error_DeleteApp" xml:space="preserve">
+  <data name="Description_DeleteAppError" xml:space="preserve">
     <value>앱을 삭제하는 도중 에러가 발생하였습니다</value>
   </data>
-  <data name="Error_LoadAccounts" xml:space="preserve">
+  <data name="Description_InvalidLoginAuthCode" xml:space="preserve">
+    <value>인증 코드가 올바르지 않습니다</value>
+  </data>
+  <data name="Description_InvalidPassword" xml:space="preserve">
+    <value>비밀번호가 올바르지 않습니다</value>
+  </data>
+  <data name="Description_LoadAccountsError" xml:space="preserve">
     <value>계정들을 로드하는 도중 에러가 발생하였습니다</value>
   </data>
-  <data name="Error_LoadApps" xml:space="preserve">
+  <data name="Description_LoadAppsError" xml:space="preserve">
     <value>앱들을 로드하는 도중 에러가 발생하였습니다</value>
+  </data>
+  <data name="Description_TwoFactorCodeMismatch" xml:space="preserve">
+    <value>2단계 인증 코드가 올바르지 않습니다</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>에러</value>
   </data>
   <data name="Id" xml:space="preserve">
     <value>아이디</value>
