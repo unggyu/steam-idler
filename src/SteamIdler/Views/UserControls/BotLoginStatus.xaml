@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:localize="http://gu.se/Localization"
+             xmlns:properties="clr-namespace:SteamIdler.Properties"
              mc:Ignorable="d">
     <Ellipse
         Width="10"
@@ -13,9 +15,11 @@
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding Bot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="True">
                         <Setter Property="Fill" Value="Green" />
+                        <Setter Property="ToolTip" Value="{localize:Static properties:Resources.LoggedIn}" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Bot.IsLoggedOn, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" Value="False">
                         <Setter Property="Fill" Value="Red" />
+                        <Setter Property="ToolTip" Value="{localize:Static properties:Resources.NotLoggedIn}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

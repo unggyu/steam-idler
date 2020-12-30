@@ -232,6 +232,24 @@ namespace SteamIdler.Properties {
         }
         
         /// <summary>
+        ///   Not Logged In과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string LoggedIn {
+            get {
+                return ResourceManager.GetString("LoggedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Logged In과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string NotLoggedIn {
+            get {
+                return ResourceManager.GetString("NotLoggedIn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Password과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string Password {

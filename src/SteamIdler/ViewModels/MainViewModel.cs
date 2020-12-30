@@ -129,6 +129,7 @@ namespace SteamIdler.ViewModels
                     };
                     steamBot.LoggedOn += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
                     steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
+                    steamBot.LoggedOff += (obj, callback) => RaisePropertyChanged(nameof(IsAllBotsLoggedIn));
                     var SteamBotForVisual = new SteamBotForVisual
                     {
                         SteamBot = steamBot
