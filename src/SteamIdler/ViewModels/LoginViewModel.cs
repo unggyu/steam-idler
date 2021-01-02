@@ -1,8 +1,9 @@
 ﻿using Prism.Commands;
 using Prism.Events;
-using SteamIdler.Events;
 using SteamIdler.Infrastructure;
 using SteamIdler.Infrastructure.Constants;
+using SteamIdler.Properties;
+using SteamIdler.Services;
 using SteamKit2;
 using System;
 using System.Threading;
@@ -13,10 +14,11 @@ namespace SteamIdler.ViewModels
     public class LoginViewModel : ViewModelBase
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly ISteamErrorMessageService _steamErrorMessageService;
         private SteamBot _steamBot;
         private string _username;
         private string _password;
-        private string _errorText;
+        private string _errorMessage;
         private bool _isTryingToLogin;
         private CodeType? _codeType;
         private string _code;
@@ -25,9 +27,10 @@ namespace SteamIdler.ViewModels
 
         private ICommand _signInCommand;
 
-        public LoginViewModel(IEventAggregator eventAggregator)
+        public LoginViewModel(IEventAggregator eventAggregator, ISteamErrorMessageService steamErrorMessageService)
         {
             _eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
+            _steamErrorMessageService = steamErrorMessageService ?? throw new ArgumentNullException(nameof(steamErrorMessageService));
 
             Initialize();
         }
@@ -44,10 +47,10 @@ namespace SteamIdler.ViewModels
             set => SetValue(ref _password, value);
         }
 
-        public string ErrorText
+        public string ErrorMessage
         {
-            get => _errorText;
-            set => SetValue(ref _errorText, value);
+            get => _errorMessage;
+            set => SetValue(ref _errorMessage, value);
         }
 
         public bool IsTryingToLogin
@@ -113,33 +116,42 @@ namespace SteamIdler.ViewModels
                 switch (loginResult.Result)
                 {
                     case EResult.OK:
-                        if (AutomaticLogin)
+                        ErrorMessage = null;
+                        ErrorMessage = null;
+                        Code = null;
+                        CodeType = null;
+                        break;
+                    case EResult.InvalidPassword:
+                        if (!string.IsNullOrWhiteSpace(_steamBot.LogOnDetails.LoginKey) && _steamBot.LogOnDetails.ShouldRememberPassword)
                         {
-                            _steamBot.LogOnDetails.ShouldRememberPassword = true;
+                            _steamBot.LogOnDetails.LoginKey = string.Empty;
+                            _steamBot.Account.LoginKey = string.Empty;
+
+                            throw new Exception(Resources.Description_InvalidLoginKey);
                         }
-                        _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish(_steamBot);
-                        break;
-                    case EResult.AccountLogonDenied:
-                    case EResult.AccountLogonDeniedVerifiedEmailRequired:
-                        await _steamBot.AwaitDisconnectAsync();
-                        CodeType = Infrastructure.Constants.CodeType.Auth;
-                        await _steamBot.ConnectAsync();
-                        break;
-                    case EResult.AccountLoginDeniedNeedTwoFactor:
-                        await _steamBot.AwaitDisconnectAsync();
-                        CodeType = Infrastructure.Constants.CodeType.TwoFactor;
-                        await _steamBot.ConnectAsync();
                         break;
                     default:
                         await _steamBot.AwaitDisconnectAsync();
-                        ErrorText = loginResult.Result.ToString();
                         await _steamBot.ConnectAsync();
-                        break;
+                        switch (loginResult.Result)
+                        {
+                            case EResult.AccountLogonDenied:
+                            case EResult.AccountLogonDeniedVerifiedEmailRequired:
+                            case EResult.InvalidLoginAuthCode:
+                                CodeType = Infrastructure.Constants.CodeType.Auth;
+                                break;
+                            case EResult.AccountLoginDeniedNeedTwoFactor:
+                            case EResult.TwoFactorCodeMismatch:
+                                CodeType = Infrastructure.Constants.CodeType.TwoFactor;
+                                break;
+                        }
+                        var errorMsg = await _steamErrorMessageService.GetErrorMessageAsync(loginResult.Result);
+                        throw new Exception(errorMsg);
                 }
             }
             catch (Exception ex)
             {
-                ErrorText = ex.Message;
+                ErrorMessage = ex.Message;
             }
             finally
             {
