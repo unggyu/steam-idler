@@ -1,5 +1,6 @@
 ﻿using Prism.Commands;
 using Prism.Events;
+using SteamIdler.Events;
 using SteamIdler.Infrastructure;
 using SteamIdler.Infrastructure.Constants;
 using SteamIdler.Properties;
@@ -120,6 +121,7 @@ namespace SteamIdler.ViewModels
                         ErrorMessage = null;
                         Code = null;
                         CodeType = null;
+                        _eventAggregator.GetEvent<LoginSuccessfulEvent>().Publish(_steamBot);
                         break;
                     case EResult.InvalidPassword:
                         if (!string.IsNullOrWhiteSpace(_steamBot.LogOnDetails.LoginKey) && _steamBot.LogOnDetails.ShouldRememberPassword)
@@ -131,17 +133,13 @@ namespace SteamIdler.ViewModels
                         }
                         break;
                     default:
-                        await _steamBot.AwaitDisconnectAsync();
-                        await _steamBot.ConnectAsync();
                         switch (loginResult.Result)
                         {
                             case EResult.AccountLogonDenied:
                             case EResult.AccountLogonDeniedVerifiedEmailRequired:
-                            case EResult.InvalidLoginAuthCode:
                                 CodeType = Infrastructure.Constants.CodeType.Auth;
                                 break;
                             case EResult.AccountLoginDeniedNeedTwoFactor:
-                            case EResult.TwoFactorCodeMismatch:
                                 CodeType = Infrastructure.Constants.CodeType.TwoFactor;
                                 break;
                         }

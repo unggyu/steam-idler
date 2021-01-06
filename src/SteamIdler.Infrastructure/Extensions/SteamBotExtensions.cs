@@ -100,6 +100,8 @@ namespace SteamIdler.Infrastructure
 
             if (codeType.HasValue)
             {
+                code = code.Trim();
+
                 switch (codeType)
                 {
                     case CodeType.Auth:

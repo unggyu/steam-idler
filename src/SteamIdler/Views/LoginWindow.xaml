@@ -58,7 +58,7 @@
             x:Name="ErrorTextBox"
             Grid.Row="3"
             Foreground="Red"
-            Text="{Binding ErrorText}" />
+            Text="{Binding ErrorMessage}" />
         <Button
             Grid.Column="1"
             Grid.Row="1"

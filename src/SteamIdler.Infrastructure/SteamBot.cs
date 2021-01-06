@@ -88,7 +88,15 @@ namespace SteamIdler.Infrastructure
                 {
                     LogOnDetails.Username = _account.Username;
                     LogOnDetails.Password = _account.Password;
-                    LogOnDetails.LoginKey = _account.LoginKey;
+                    if (string.IsNullOrWhiteSpace(_account.LoginKey) && !string.IsNullOrWhiteSpace(LogOnDetails.LoginKey))
+                    {
+                        _account.LoginKey = LogOnDetails.LoginKey;
+                    }
+                    else
+                    {
+                        LogOnDetails.LoginKey = _account.LoginKey;
+                    }
+                    
                     LogOnDetails.ShouldRememberPassword = _account.AutomaticLogin;
                 }
             }
@@ -342,11 +350,10 @@ namespace SteamIdler.Infrastructure
 
             LogOnDetails.LoginKey = callback.LoginKey;
 
-            var account = Account ?? await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(LogOnDetails.Username));
-            if (account != null)
+            if (_account != null)
             {
-                account.LoginKey = callback.LoginKey;
-                await _accountRepository.EditAsync(account);
+                _account.LoginKey = callback.LoginKey;
+                await _accountRepository.EditAsync(_account);
             }
         }
     }
