@@ -348,10 +348,6 @@ namespace SteamIdler.Infrastructure
                 account.LoginKey = callback.LoginKey;
                 await _accountRepository.EditAsync(account);
             }
-            else
-            {
-                throw new AccountNotFoundException(LogOnDetails.Username);
-            }
         }
     }
 }
