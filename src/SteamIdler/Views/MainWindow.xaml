@@ -171,7 +171,7 @@
                                 <TextBox
                                     ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.Username}"
                                     Width="250"
-                                    Text="{Binding PlacementTarget.SelectedItem.SteamBot.LogOnDetails.Username, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                                    Text="{Binding PlacementTarget.SelectedItem.SteamBot.LogOnDetails.Username, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, UpdateSourceTrigger=PropertyChanged}" />
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem>
@@ -180,7 +180,7 @@
                                     x:Name="PasswordBox"
                                     ui:ControlHelper.PlaceholderText="{localize:Static properties:Resources.Password}"
                                     helpers:PasswordHelper.Attach="True"
-                                    helpers:PasswordHelper.Password="{Binding PlacementTarget.SelectedItem.SteamBot.LogOnDetails.Password, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" />
+                                    helpers:PasswordHelper.Password="{Binding PlacementTarget.SelectedItem.SteamBot.LogOnDetails.Password, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, UpdateSourceTrigger=PropertyChanged}" />
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
