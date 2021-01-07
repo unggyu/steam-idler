@@ -1,5 +1,4 @@
 ﻿using SteamIdler.Infrastructure.Constants;
-using SteamIdler.Infrastructure.Exceptions;
 using SteamIdler.Infrastructure.Models;
 using SteamIdler.Infrastructure.Repositories;
 using SteamKit2;
@@ -88,15 +87,7 @@ namespace SteamIdler.Infrastructure
                 {
                     LogOnDetails.Username = _account.Username;
                     LogOnDetails.Password = _account.Password;
-                    if (string.IsNullOrWhiteSpace(_account.LoginKey) && !string.IsNullOrWhiteSpace(LogOnDetails.LoginKey))
-                    {
-                        _account.LoginKey = LogOnDetails.LoginKey;
-                    }
-                    else
-                    {
-                        LogOnDetails.LoginKey = _account.LoginKey;
-                    }
-                    
+                    LogOnDetails.LoginKey = _account.LoginKey;
                     LogOnDetails.ShouldRememberPassword = _account.AutomaticLogin;
                 }
             }

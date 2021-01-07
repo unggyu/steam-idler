@@ -40,6 +40,12 @@ namespace SteamIdler.Services
             await _accountRepository.AddAsync(account, cancellationToken);
 
             var dbAccount = await _accountRepository.GetFirstItemAsync(a => a.Username.Equals(account), cancellationToken);
+            if (!string.IsNullOrWhiteSpace(bot.LogOnDetails.LoginKey))
+            {
+                dbAccount.LoginKey = bot.LogOnDetails.LoginKey;
+                await _accountRepository.EditAsync(dbAccount, cancellationToken);
+            }
+
             bot.Account = dbAccount;
 
             return bot;
